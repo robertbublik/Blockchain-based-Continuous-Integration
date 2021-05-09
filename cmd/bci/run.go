@@ -4,21 +4,21 @@ import (
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/web3coach/the-blockchain-bar/database"
-	"github.com/web3coach/the-blockchain-bar/node"
+	"github.com/robertbublik/bci/database"
+	"github.com/robertbublik/bci/node"
 	"os"
 )
 
 func runCmd() *cobra.Command {
 	var runCmd = &cobra.Command{
 		Use:   "run",
-		Short: "Launches the TBB node and its HTTP API.",
+		Short: "Launches the BCI node and its HTTP API.",
 		Run: func(cmd *cobra.Command, args []string) {
 			miner, _ := cmd.Flags().GetString(flagMiner)
 			ip, _ := cmd.Flags().GetString(flagIP)
 			port, _ := cmd.Flags().GetUint64(flagPort)
 
-			fmt.Println("Launching TBB node and its HTTP API...")
+			fmt.Println("Launching BCI node and its HTTP API...")
 
 			bootstrap := node.NewPeerNode(
 				"127.0.0.1",

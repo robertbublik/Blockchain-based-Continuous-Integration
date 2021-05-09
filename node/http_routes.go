@@ -2,7 +2,7 @@ package node
 
 import (
 	"fmt"
-	"github.com/web3coach/the-blockchain-bar/database"
+	"github.com/robertbublik/bci/database"
 	"net/http"
 	"strconv"
 )

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/web3coach/the-blockchain-bar/fs"
+	"github.com/robertbublik/bci/fs"
 	"os"
 )
 
@@ -13,19 +13,19 @@ const flagIP = "ip"
 const flagPort = "port"
 
 func main() {
-	var tbbCmd = &cobra.Command{
-		Use:   "tbb",
-		Short: "The Blockchain Bar CLI",
+	var bciCmd = &cobra.Command{
+		Use:   "bci",
+		Short: "Blockchain-based Continuous Integration CLI",
 		Run: func(cmd *cobra.Command, args []string) {
 		},
 	}
 
-	tbbCmd.AddCommand(migrateCmd())
-	tbbCmd.AddCommand(versionCmd)
-	tbbCmd.AddCommand(runCmd())
-	tbbCmd.AddCommand(balancesCmd())
+	bciCmd.AddCommand(migrateCmd())
+	bciCmd.AddCommand(versionCmd)
+	bciCmd.AddCommand(runCmd())
+	bciCmd.AddCommand(balancesCmd())
 
-	err := tbbCmd.Execute()
+	err := bciCmd.Execute()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

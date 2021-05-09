@@ -3,8 +3,8 @@ package node
 import (
 	"context"
 	"fmt"
-	"github.com/web3coach/the-blockchain-bar/database"
-	"github.com/web3coach/the-blockchain-bar/fs"
+	"github.com/robertbublik/bci/database"
+	"github.com/robertbublik/bci/fs"
 	"math/rand"
 	"time"
 )

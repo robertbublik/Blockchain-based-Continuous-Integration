@@ -84,12 +84,12 @@ Together with all students, we will use this custom build blockchain for educati
 ##### Download
 ###### Linux
 ```bash
-wget "https://github.com/web3coach/the-blockchain-bar/releases/download/1.0.0-alpha/tbb-linux-amd64" -O /usr/local/bin/tbb
+wget "https://github.com/robertbublik/bci/releases/download/1.0.0-alpha/tbb-linux-amd64" -O /usr/local/bin/tbb
 ```
 
 ###### MacOS
 ```bash
-wget "https://github.com/web3coach/the-blockchain-bar/releases/download/1.0.0-alpha/tbb-osx" -O /usr/local/bin/tbb
+wget "https://github.com/robertbublik/bci/releases/download/1.0.0-alpha/tbb-osx" -O /usr/local/bin/tbb
 ```
 
 ##### Verify the version

@@ -1,4 +1,4 @@
-module github.com/web3coach/the-blockchain-bar
+module github.com/robertbublik/bci
 
 go 1.13
 

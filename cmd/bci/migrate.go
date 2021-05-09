@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/web3coach/the-blockchain-bar/database"
-	"github.com/web3coach/the-blockchain-bar/node"
+	"github.com/robertbublik/bci/database"
+	"github.com/robertbublik/bci/node"
 	"time"
 )
 

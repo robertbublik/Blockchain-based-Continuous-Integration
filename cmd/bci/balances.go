@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/web3coach/the-blockchain-bar/database"
+	"github.com/robertbublik/bci/database"
 	"os"
 )
 
