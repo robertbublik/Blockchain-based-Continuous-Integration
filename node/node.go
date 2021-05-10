@@ -87,7 +87,7 @@ func (n *Node) Run(ctx context.Context) error {
 	fmt.Printf("	- hash: %s\n", n.state.LatestBlockHash().Hex())
 
 	go n.sync(ctx)
-	go n.mine(ctx)
+	//go n.mine(ctx)
 
 	http.HandleFunc("/balances/list", func(w http.ResponseWriter, r *http.Request) {
 		listBalancesHandler(w, r, state)
@@ -95,6 +95,10 @@ func (n *Node) Run(ctx context.Context) error {
 
 	http.HandleFunc("/tx/add", func(w http.ResponseWriter, r *http.Request) {
 		txAddHandler(w, r, n)
+	})
+
+	http.HandleFunc("/tx/mine", func(w http.ResponseWriter, r *http.Request) {
+		txMineHandler(w, r, n)
 	})
 
 	http.HandleFunc(endpointStatus, func(w http.ResponseWriter, r *http.Request) {
@@ -129,7 +133,7 @@ func (n *Node) LatestBlockHash() database.Hash {
 	return n.state.LatestBlockHash()
 }
 
-func (n *Node) mine(ctx context.Context) error {
+/* func (n *Node) mine(ctx context.Context) error {
 	var miningCtx context.Context
 	var stopCurrentMining context.CancelFunc
 
@@ -166,9 +170,9 @@ func (n *Node) mine(ctx context.Context) error {
 			return nil
 		}
 	}
-}
+} */
 
-func (n *Node) minePendingTXs(ctx context.Context) error {
+/* func (n *Node) minePendingTXs(ctx context.Context) error {
 	blockToMine := NewPendingBlock(
 		n.state.LatestBlockHash(),
 		n.state.NextBlockNumber(),
@@ -189,8 +193,9 @@ func (n *Node) minePendingTXs(ctx context.Context) error {
 	}
 
 	return nil
-}
+} */
 
+//remove for loop as each block contains only 1 transaction
 func (n *Node) removeMinedPendingTXs(block database.Block) {
 	if len(block.TXs) > 0 && len(n.pendingTXs) > 0 {
 		fmt.Println("Updating in-memory Pending TXs Pool:")
@@ -248,6 +253,7 @@ func (n *Node) AddPendingTX(tx database.Tx, fromPeer PeerNode) error {
 	return nil
 }
 
+/* probably unnecessary since each time only 1 pending transaction will be removed 
 func (n *Node) getPendingTXsAsArray() []database.Tx {
 	txs := make([]database.Tx, len(n.pendingTXs))
 
@@ -258,4 +264,4 @@ func (n *Node) getPendingTXsAsArray() []database.Tx {
 	}
 
 	return txs
-}
+} */
