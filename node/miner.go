@@ -3,22 +3,24 @@ package node
 import (
 	"context"
 	"fmt"
-	"github.com/robertbublik/bci/database"
-	"github.com/robertbublik/bci/fs"
+	"github.com/web3coach/the-blockchain-bar/database"
+	"github.com/web3coach/the-blockchain-bar/fs"
 	"math/rand"
 	"time"
 )
 
 type PendingBlock struct {
-	parent database.Hash
-	number uint64
-	time   uint64
-	miner  database.Account
-	txs    []database.Tx
+	parent 		database.Hash
+	commit 		20[byte]
+	prevCommit 	20[byte]
+	index 		uint64
+	time   		uint64
+	miner  		database.Account
+	txs    		[]database.Tx
 }
 
-func NewPendingBlock(parent database.Hash, number uint64, miner database.Account, txs []database.Tx) PendingBlock {
-	return PendingBlock{parent, number, uint64(time.Now().Unix()), miner, txs}
+func NewPendingBlock(parent database.Hash, commit 20[byte], prevCommit 20[byte], index uint64, miner database.Account, txs []database.Tx) PendingBlock {
+	return PendingBlock{parent, commit, prevCommit, index, uint64(time.Now().Unix()), miner, txs}
 }
 
 func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
@@ -48,7 +50,7 @@ func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
 			fmt.Printf("Mining %d Pending TXs. Attempt: %d\n", len(pb.txs), attempt)
 		}
 
-		block = database.NewBlock(pb.parent, pb.number, nonce, pb.time, pb.miner, pb.txs)
+		block = database.NewBlock(pb.parent, pb.index, nonce, pb.time, pb.miner, pb.txs)
 		blockHash, err := block.Hash()
 		if err != nil {
 			return database.Block{}, fmt.Errorf("couldn't mine block. %s", err.Error())
@@ -58,7 +60,7 @@ func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
 	}
 
 	fmt.Printf("\nMined new Block '%x' using PoW🎉🎉🎉%s:\n", hash, fs.Unicode("\\U1F389"))
-	fmt.Printf("\tHeight: '%v'\n", block.Header.Number)
+	fmt.Printf("\tHeight: '%v'\n", block.Header.Index)
 	fmt.Printf("\tNonce: '%v'\n", block.Header.Nonce)
 	fmt.Printf("\tCreated: '%v'\n", block.Header.Time)
 	fmt.Printf("\tMiner: '%v'\n", block.Header.Miner)

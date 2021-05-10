@@ -63,11 +63,17 @@ func (n *Node) doSync() {
 			fmt.Printf("ERROR: %s\n", err)
 			continue
 		}
+
+		err = n.syncMiningTXs(peer, status.MiningTXs)
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+			continue
+		}
 	}
 }
 
 func (n *Node) syncBlocks(peer PeerNode, status StatusRes) error {
-	localBlockNumber := n.state.LatestBlock().Header.Number
+	localBlockIndex := n.state.LatestBlock().Header.Index
 
 	// If the peer has no blocks, ignore it
 	if status.Hash.IsEmpty() {
@@ -75,18 +81,18 @@ func (n *Node) syncBlocks(peer PeerNode, status StatusRes) error {
 	}
 
 	// If the peer has less blocks than us, ignore it
-	if status.Number < localBlockNumber {
+	if status.Index < localBlockIndex {
 		return nil
 	}
 
 	// If it's the genesis block and we already synced it, ignore it
-	if status.Number == 0 && !n.state.LatestBlockHash().IsEmpty() {
+	if status.Index == 0 && !n.state.LatestBlockHash().IsEmpty() {
 		return nil
 	}
 
 	// Display found 1 new block if we sync the genesis block 0
-	newBlocksCount := status.Number - localBlockNumber
-	if localBlockNumber == 0 && status.Number == 0 {
+	newBlocksCount := status.Index - localBlockIndex
+	if localBlockIndex == 0 && status.Index == 0 {
 		newBlocksCount = 1
 	}
 	fmt.Printf("Found %d new blocks from Peer %s\n", newBlocksCount, peer.TcpAddress())
@@ -129,6 +135,34 @@ func (n *Node) syncPendingTXs(peer PeerNode, txs []database.Tx) error {
 	}
 
 	return nil
+}
+
+func (n *Node) syncMiningTXs(peer PeerNode, txs []database.Tx) error {
+	for _, peer := range n.knownPeers {
+		if n.info.IP == peer.IP && n.info.Port == peer.Port {
+			continue
+		}
+
+		fmt.Printf("Searching for new Peers and their Blocks and Peers: '%s'\n", peer.TcpAddress())
+
+		status, err := queryPeerStatus(peer)
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+			fmt.Printf("Peer '%s' was removed from KnownPeers\n", peer.TcpAddress())
+
+			n.RemovePeer(peer)
+
+			continue
+		}
+		for _, tx := range txs {
+			err := n.UpdateMiningTX(tx, peer)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
 }
 
 func (n *Node) joinKnownPeers(peer PeerNode) error {

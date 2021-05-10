@@ -45,6 +45,7 @@ type Node struct {
 	state           *database.State
 	knownPeers      map[string]PeerNode
 	pendingTXs      map[string]database.Tx
+	miningTXs       map[string]database.Tx
 	archivedTXs     map[string]database.Tx
 	newSyncedBlocks chan database.Block
 	newPendingTXs   chan database.Tx
@@ -60,6 +61,7 @@ func New(dataDir string, ip string, port uint64, acc database.Account, bootstrap
 		info:            NewPeerNode(ip, port, false, acc, true),
 		knownPeers:      knownPeers,
 		pendingTXs:      make(map[string]database.Tx),
+		miningTXs:       make(map[string]database.Tx),
 		archivedTXs:     make(map[string]database.Tx),
 		newSyncedBlocks: make(chan database.Block),
 		newPendingTXs:   make(chan database.Tx, 10000),
@@ -83,7 +85,7 @@ func (n *Node) Run(ctx context.Context) error {
 	n.state = state
 
 	fmt.Println("Blockchain state:")
-	fmt.Printf("	- height: %d\n", n.state.LatestBlock().Header.Number)
+	fmt.Printf("	- height: %d\n", n.state.LatestBlock().Header.Index)
 	fmt.Printf("	- hash: %s\n", n.state.LatestBlockHash().Hex())
 
 	go n.sync(ctx)
@@ -253,7 +255,12 @@ func (n *Node) AddPendingTX(tx database.Tx, fromPeer PeerNode) error {
 	return nil
 }
 
-/* probably unnecessary since each time only 1 pending transaction will be removed 
+func (n *Node) UpdateMiningTX(tx database.Tx, fromPeer PeerNode) error {
+	for _, tx := range n.miningTXs {
+		
+	}
+}
+
 func (n *Node) getPendingTXsAsArray() []database.Tx {
 	txs := make([]database.Tx, len(n.pendingTXs))
 
@@ -264,4 +271,16 @@ func (n *Node) getPendingTXsAsArray() []database.Tx {
 	}
 
 	return txs
-} */
+}
+
+func (n *Node) getMiningTXsAsArray() []database.Tx {
+	txs := make([]database.Tx, len(n.miningTXs))
+
+	i := 0
+	for _, tx := range n.pendingTXs {
+		txs[i] = tx
+		i++
+	}
+
+	return txs
+}
