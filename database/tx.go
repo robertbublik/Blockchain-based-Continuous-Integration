@@ -23,7 +23,7 @@ type Tx struct {
 }
 
 func NewTx(from Account, value uint, repository string, commit 20[byte], prevCommit 20[byte], occupied bool) Tx {
-	return Tx{from, to, value, repository, commit, prevCommit, uint64(time.Now().Unix()) occupied}
+	return Tx{from, value, repository, commit, prevCommit, uint64(time.Now().Unix()) occupied}
 }
 
 func (t Tx) IsReward() bool {
