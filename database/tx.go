@@ -20,10 +20,11 @@ type Tx struct {
 	prevCommit 	20[byte] 	`json:"prevCommit"`
 	Time  		uint64  	`json:"time"`
 	Occupied	bool		`json:"occupied"`
+	Index 		uint64  	`json:"index"`
 }
 
-func NewTx(from Account, value uint, repository string, commit 20[byte], prevCommit 20[byte], occupied bool) Tx {
-	return Tx{from, value, repository, commit, prevCommit, uint64(time.Now().Unix()) occupied}
+func NewTx(from Account, value uint, repository string, commit 20[byte], prevCommit 20[byte], occupied bool, index uint64) Tx {
+	return Tx{from, value, repository, commit, prevCommit, uint64(time.Now().Unix()) occupied, index}
 }
 
 func (t Tx) IsReward() bool {
