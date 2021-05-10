@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-const BlockReward = 100
+//const BlockReward = 100
 
 type Hash [32]byte
 
@@ -37,11 +37,14 @@ type Block struct {
 }
 
 type BlockHeader struct {
-	Parent Hash    `json:"parent"`
-	Number uint64  `json:"number"`
-	Nonce  uint32  `json:"nonce"`
-	Time   uint64  `json:"time"`
-	Miner  Account `json:"miner"`
+	Parent 		Hash    	`json:"parent"`
+	Repository	String		`json:"repository"`
+	Commit		20[byte]	`json:"commit"`
+	PrevCommit 	20[byte]	`json:"prevCommit"`
+	BuildTime	uint16  	`json:"buildTime"`
+	Number 		uint64  	`json:"number"`
+	Time   		uint64  	`json:"time"`
+	Miner  		Account		`json:"miner"`
 }
 
 type BlockFS struct {
@@ -49,8 +52,8 @@ type BlockFS struct {
 	Value Block `json:"block"`
 }
 
-func NewBlock(parent Hash, number uint64, nonce uint32, time uint64, miner Account, txs []Tx) Block {
-	return Block{BlockHeader{parent, number, nonce, time, miner}, txs}
+func NewBlock(parent Hash, repository string, commit 20[byte], prevCommit 20[byte], buildTime uint16 number uint64, time uint64, miner Account, txs []Tx) Block {
+	return Block{BlockHeader{parent, repository, commit, prevCommit, buildTime, number, nonce, time, miner}, txs}
 }
 
 func (b Block) Hash() (Hash, error) {
@@ -60,11 +63,4 @@ func (b Block) Hash() (Hash, error) {
 	}
 
 	return sha256.Sum256(blockJson), nil
-}
-
-func IsBlockHashValid(hash Hash) bool {
-	return fmt.Sprintf("%x", hash[0]) == "0" &&
-		fmt.Sprintf("%x", hash[1]) == "0" &&
-		fmt.Sprintf("%x", hash[2]) == "0" &&
-		fmt.Sprintf("%x", hash[3]) != "0"
 }

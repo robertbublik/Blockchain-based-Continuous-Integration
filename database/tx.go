@@ -13,15 +13,16 @@ func NewAccount(value string) Account {
 }
 
 type Tx struct {
-	From  Account `json:"from"`
-	To    Account `json:"to"`
-	Value uint    `json:"value"`
-	Data  string  `json:"data"`
-	Time  uint64  `json:"time"`
+	From  		Account 	`json:"from"`
+	Value 		uint    	`json:"value"`
+	Repository  string  	`json:"repository"`
+	Commit 		20[byte] 	`json:"commit"`
+	prevCommit 	20[byte] 	`json:"prevCommit"`
+	Time  		uint64  	`json:"time"`
 }
 
-func NewTx(from Account, to Account, value uint, data string) Tx {
-	return Tx{from, to, value, data, uint64(time.Now().Unix())}
+func NewTx(from Account, value uint, repository string, commit 20[byte], prevCommit 20[byte]) Tx {
+	return Tx{from, to, value, repository, commit, prevCommit, uint64(time.Now().Unix())}
 }
 
 func (t Tx) IsReward() bool {
