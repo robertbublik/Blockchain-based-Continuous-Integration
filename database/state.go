@@ -16,6 +16,7 @@ type State struct {
 
 	latestBlock     Block
 	latestBlockHash Hash
+	latestTx		Tx
 	hasGenesisBlock bool
 }
 
@@ -130,12 +131,24 @@ func (s *State) NextBlockIndex() uint64 {
 	return s.LatestBlock().Header.Index + 1
 }
 
+func (s *State) NextTxIndex() uint64 {
+	return s.LatestTx().Index + 1
+}
+
 func (s *State) LatestBlock() Block {
 	return s.latestBlock
 }
 
 func (s *State) LatestBlockHash() Hash {
 	return s.latestBlockHash
+}
+
+func (s *State) LatestTx() Tx {
+	return s.latestBlock
+}
+
+func (s *State) LatestTxIndex() uint64 {
+	return s.latestTx.Index
 }
 
 func (s *State) Close() error {
@@ -147,6 +160,7 @@ func (s *State) copy() State {
 	c.hasGenesisBlock = s.hasGenesisBlock
 	c.latestBlock = s.latestBlock
 	c.latestBlockHash = s.latestBlockHash
+	c.latestTx = s.latestTx
 	c.Balances = make(map[Account]uint)
 
 	for acc, balance := range s.Balances {
