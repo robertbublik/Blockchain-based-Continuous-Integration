@@ -122,12 +122,12 @@ func (s *State) AddBlock(b Block) (Hash, error) {
 	return blockHash, nil
 }
 
-func (s *State) NextBlockNumber() uint64 {
+func (s *State) NextBlockIndex() uint64 {
 	if !s.hasGenesisBlock {
 		return uint64(0)
 	}
 
-	return s.LatestBlock().Header.Number + 1
+	return s.LatestBlock().Header.Index + 1
 }
 
 func (s *State) LatestBlock() Block {
@@ -160,13 +160,13 @@ func (s *State) copy() State {
 //
 // Block metadata are verified as well as transactions within (sufficient balances, etc).
 func applyBlock(b Block, s *State) error {
-	nextExpectedBlockNumber := s.latestBlock.Header.Number + 1
+	nextExpectedBlockIndex := s.latestBlock.Header.Index + 1
 
-	if s.hasGenesisBlock && b.Header.Number != nextExpectedBlockNumber {
-		return fmt.Errorf("next expected block must be '%d' not '%d'", nextExpectedBlockNumber, b.Header.Number)
+	if s.hasGenesisBlock && b.Header.Index != nextExpectedBlockIndex {
+		return fmt.Errorf("next expected block must be '%d' not '%d'", nextExpectedBlockIndex, b.Header.Index)
 	}
 
-	if s.hasGenesisBlock && s.latestBlock.Header.Number > 0 && !reflect.DeepEqual(b.Header.Parent, s.latestBlockHash) {
+	if s.hasGenesisBlock && s.latestBlock.Header.Index > 0 && !reflect.DeepEqual(b.Header.Parent, s.latestBlockHash) {
 		return fmt.Errorf("next block parent hash must be '%x' not '%x'", s.latestBlockHash, b.Header.Parent)
 	}
 
