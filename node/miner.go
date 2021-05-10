@@ -10,17 +10,18 @@ import (
 )
 
 type PendingBlock struct {
+	index 		uint64
 	parent 		database.Hash
+	repository	string
 	commit 		20[byte]
 	prevCommit 	20[byte]
-	index 		uint64
 	time   		uint64
 	miner  		database.Account
-	txs    		[]database.Tx
+	tx    		database.Tx
 }
 
-func NewPendingBlock(parent database.Hash, commit 20[byte], prevCommit 20[byte], index uint64, miner database.Account, txs []database.Tx) PendingBlock {
-	return PendingBlock{parent, commit, prevCommit, index, uint64(time.Now().Unix()), miner, txs}
+func NewPendingBlock(index uint64, parent database.Hash, repository string, commit 20[byte], prevCommit 20[byte], miner database.Account, txs []database.Tx) PendingBlock {
+	return PendingBlock{index, parent, repository, commit, prevCommit, uint64(time.Now().Unix()), miner, tx}
 }
 
 func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
