@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/robertbublik/bci/database"
 	"net/http"
-	"time"
+	//"time"
 )
 
 const DefaultMiner = ""
@@ -199,21 +199,14 @@ func (n *Node) LatestBlockHash() database.Hash {
 	return nil
 } */
 
-// TODO: remove for loop as each block contains only 1 transaction
-//		 set 	
+
 func (n *Node) removeMinedPendingTXs(block database.Block) {
-	if len(block.TXs) > 0 && len(n.pendingTXs) > 0 {
-		fmt.Println("Updating in-memory Pending TXs Pool:")
-	}
+	txHash, _ := block.Body.TX.Hash()
+	if _, exists := n.pendingTXs[txHash.Hex()]; exists {
+		fmt.Printf("\t-archiving mined TX: %s\n", txHash.Hex())
 
-	for _, tx := range block.TXs {
-		txHash, _ := tx.Hash()
-		if _, exists := n.pendingTXs[txHash.Hex()]; exists {
-			fmt.Printf("\t-archiving mined TX: %s\n", txHash.Hex())
-
-			n.archivedTXs[txHash.Hex()] = tx
-			delete(n.pendingTXs, txHash.Hex())
-		}
+		n.archivedTXs[txHash.Hex()] = block.Body.TX
+		delete(n.pendingTXs, txHash.Hex())
 	}
 }
 
