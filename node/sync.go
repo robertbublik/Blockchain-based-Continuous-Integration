@@ -75,18 +75,18 @@ func (n *Node) syncBlocks(peer PeerNode, status StatusRes) error {
 	}
 
 	// If the peer has less blocks than us, ignore it
-	if status.Index < localBlockIndex {
+	if status.BlockIndex < localBlockIndex {
 		return nil
 	}
 
 	// If it's the genesis block and we already synced it, ignore it
-	if status.Index == 0 && !n.state.LatestBlockHash().IsEmpty() {
+	if status.BlockIndex == 0 && !n.state.LatestBlockHash().IsEmpty() {
 		return nil
 	}
 
 	// Display found 1 new block if we sync the genesis block 0
-	newBlocksCount := status.Index - localBlockIndex
-	if localBlockIndex == 0 && status.Index == 0 {
+	newBlocksCount := status.BlockIndex - localBlockIndex
+	if localBlockIndex == 0 && status.BlockIndex == 0 {
 		newBlocksCount = 1
 	}
 	fmt.Printf("Found %d new blocks from Peer %s\n", newBlocksCount, peer.TcpAddress())
