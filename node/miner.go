@@ -25,7 +25,7 @@ func NewPendingBlock(index uint64, parent database.Hash, repository string, comm
 }
 
 func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
-	if len(pb.txs) == 0 {
+	/* if len(pb.txs) == 0 {
 		return database.Block{}, fmt.Errorf("mining empty blocks is not allowed")
 	}
 
@@ -70,11 +70,7 @@ func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
 	fmt.Printf("\tAttempt: '%v'\n", attempt)
 	fmt.Printf("\tTime: %s\n\n", time.Since(start))
 
-	return block, nil
+	return block, nil */
 }
 
-func generateNonce() uint32 {
-	rand.Seed(time.Now().UTC().UnixNano())
 
-	return rand.Uint32()
-}
