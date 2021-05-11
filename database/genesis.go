@@ -8,9 +8,14 @@ import (
 var genesisJson = `
 {
   "genesis_time": "2019-03-18T00:00:00.000000000Z",
-  "chain_id": "the-blockchain-bar-ledger",
+  "chain_id": "BCI-ledger",
   "balances": {
-    "andrej": 1000000
+    "developer-1": 1000,
+	"developer-2": 1000,
+	"developer-3": 1000,
+	"miner-1": 0,
+	"miner-2": 0,
+	"miner-3": 0
   }
 }`
 

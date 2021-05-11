@@ -14,7 +14,7 @@ func runCmd() *cobra.Command {
 		Use:   "run",
 		Short: "Launches the BCI node and its HTTP API.",
 		Run: func(cmd *cobra.Command, args []string) {
-			miner, _ := cmd.Flags().GetString(flagMiner)
+			account, _ := cmd.Flags().GetString(flagAccount)
 			ip, _ := cmd.Flags().GetString(flagIP)
 			port, _ := cmd.Flags().GetUint64(flagPort)
 
@@ -22,13 +22,13 @@ func runCmd() *cobra.Command {
 
 			bootstrap := node.NewPeerNode(
 				"127.0.0.1",
-				8080,
+				8070,
 				true,
-				database.NewAccount("andrej"),
+				database.NewAccount("bootstrap"),
 				false,
 			)
 
-			n := node.New(getDataDirFromCmd(cmd), ip, port, database.NewAccount(miner), bootstrap)
+			n := node.New(getDataDirFromCmd(cmd), ip, port, database.NewAccount(account), bootstrap)
 			err := n.Run(context.Background())
 			if err != nil {
 				fmt.Println(err)
