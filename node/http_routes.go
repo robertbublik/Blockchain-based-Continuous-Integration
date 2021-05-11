@@ -16,13 +16,17 @@ type BalancesRes struct {
 	Balances map[database.Account]uint `json:"balances"`
 }
 
+type PendingTxRes struct {
+	PendingTXs 	[]database.Tx 		`json:"pendingTxs"`
+}
+
 type TxReq struct {
-	From  		Account 	`json:"from"`
-	Value 		uint    	`json:"value"`
-	Repository  string  	`json:"repository"`
-	Commit 		20[byte] 	`json:"commit"`
-	prevCommit 	20[byte] 	`json:"prevCommit"`
-	Time  		uint64  	`json:"time"`
+	From  		string 	`json:"from"`
+	Value 		uint    			`json:"value"`
+	Repository  string  			`json:"repository"`
+	Commit 		[20]byte 			`json:"commit"`
+	prevCommit 	[20]byte 			`json:"prevCommit"`
+	Time  		uint64  			`json:"time"`
 }
 
 type TxAddRes struct {
@@ -54,7 +58,7 @@ func listBalancesHandler(w http.ResponseWriter, r *http.Request, state *database
 }
 
 func listPendingTxHandler(w http.ResponseWriter, r *http.Request, node *Node) {
-	writeRes(w, PendingTxRes{node.pendingTXs})
+	writeRes(w, PendingTxRes{node.getPendingTXsAsArray()})
 }
 
 // adds transaction to BCI
@@ -66,7 +70,12 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 		return
 	}
 
-	tx := database.NewTx(database.NewAccount(req.From), req.Value, req.Repository, req.Commit, req.prevCommit, false)
+	if req.Value > node.state.Balances[database.NewAccount(req.From)] {
+		writeErrRes(w, fmt.Errorf("Balance too low. %s", err.Error()))
+		return
+	}
+
+	tx := database.NewTx(database.NewAccount(req.From), req.Value, req.Repository, req.Commit, req.prevCommit)
 	err = node.AddPendingTX(tx, node.info)
 	if err != nil {
 		writeErrRes(w, err)
@@ -80,12 +89,6 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 func txMineHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	req := TxReq{}
 	err := readReq(r, &req)
-	if err != nil {
-		writeErrRes(w, err)
-		return
-	}
-
-	err = node.syncMiningTX(tx)
 	if err != nil {
 		writeErrRes(w, err)
 		return
