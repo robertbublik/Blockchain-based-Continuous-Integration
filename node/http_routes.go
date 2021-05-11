@@ -23,7 +23,6 @@ type TxReq struct {
 	Commit 		20[byte] 	`json:"commit"`
 	prevCommit 	20[byte] 	`json:"prevCommit"`
 	Time  		uint64  	`json:"time"`
-	Mining		bool		`json:"mining"`
 }
 
 type TxAddRes struct {
@@ -37,10 +36,8 @@ type TxMineRes struct {
 type StatusRes struct {
 	Hash       	database.Hash       `json:"blockHash"`
 	BlockIndex 	uint64              `json:"blockIndex"`
-	TxIndex 	uint64              `json:"txIndex"`
 	KnownPeers 	map[string]PeerNode `json:"peersKnown"`
 	PendingTXs 	[]database.Tx       `json:"pendingTxs"`
-	MiningTXs  	[]database.Tx       `json:"miningTxs"`
 }
 
 type SyncRes struct {
@@ -54,6 +51,10 @@ type AddPeerRes struct {
 
 func listBalancesHandler(w http.ResponseWriter, r *http.Request, state *database.State) {
 	writeRes(w, BalancesRes{state.LatestBlockHash(), state.Balances})
+}
+
+func listPendingTxHandler(w http.ResponseWriter, r *http.Request, node *Node) {
+	writeRes(w, PendingTxRes{node.pendingTXs})
 }
 
 // adds transaction to BCI
@@ -84,7 +85,6 @@ func txMineHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 		return
 	}
 
-	req.Mining = true
 	err = node.syncMiningTX(tx)
 	if err != nil {
 		writeErrRes(w, err)
@@ -98,7 +98,6 @@ func statusHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	res := StatusRes{
 		Hash:       node.state.LatestBlockHash(),
 		BlockIndex: node.state.LatestBlock().Header.Index,
-		TxIndex: 	node.state.LatestTx().Index,
 		KnownPeers: node.knownPeers,
 		PendingTXs: node.getPendingTXsAsArray(),
 	}
