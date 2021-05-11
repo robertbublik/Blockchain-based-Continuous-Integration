@@ -45,7 +45,6 @@ type Node struct {
 	state           *database.State
 	knownPeers      map[string]PeerNode
 	pendingTXs      map[string]database.Tx
-	miningTXs       map[string]database.Tx
 	archivedTXs     map[string]database.Tx
 	newSyncedBlocks chan database.Block
 	newPendingTXs   chan database.Tx
@@ -61,7 +60,6 @@ func New(dataDir string, ip string, port uint64, acc database.Account, bootstrap
 		info:            NewPeerNode(ip, port, false, acc, true),
 		knownPeers:      knownPeers,
 		pendingTXs:      make(map[string]database.Tx),
-		miningTXs:       make(map[string]database.Tx),
 		archivedTXs:     make(map[string]database.Tx),
 		newSyncedBlocks: make(chan database.Block),
 		newPendingTXs:   make(chan database.Tx, 10000),
@@ -93,6 +91,10 @@ func (n *Node) Run(ctx context.Context) error {
 
 	http.HandleFunc("/balances/list", func(w http.ResponseWriter, r *http.Request) {
 		listBalancesHandler(w, r, state)
+	})
+
+	http.HandleFunc("/tx/list", func(w http.ResponseWriter, r *http.Request) {
+		listPendingTxHandler(w, r, n)
 	})
 
 	http.HandleFunc("/tx/add", func(w http.ResponseWriter, r *http.Request) {
@@ -134,7 +136,7 @@ func (n *Node) Run(ctx context.Context) error {
 func (n *Node) LatestBlockHash() database.Hash {
 	return n.state.LatestBlockHash()
 }
-
+// TODO: change algorithm to CI
 /* func (n *Node) mine(ctx context.Context) error {
 	var miningCtx context.Context
 	var stopCurrentMining context.CancelFunc
@@ -197,7 +199,8 @@ func (n *Node) LatestBlockHash() database.Hash {
 	return nil
 } */
 
-//remove for loop as each block contains only 1 transaction
+// TODO: remove for loop as each block contains only 1 transaction
+//		 set 	
 func (n *Node) removeMinedPendingTXs(block database.Block) {
 	if len(block.TXs) > 0 && len(n.pendingTXs) > 0 {
 		fmt.Println("Updating in-memory Pending TXs Pool:")
@@ -255,11 +258,7 @@ func (n *Node) AddPendingTX(tx database.Tx, fromPeer PeerNode) error {
 	return nil
 }
 
-func (n *Node) UpdateMiningTX(tx database.Tx, fromPeer PeerNode) error {
-	for _, tx := range n.miningTXs {
-		
-	}
-}
+
 
 func (n *Node) getPendingTXsAsArray() []database.Tx {
 	txs := make([]database.Tx, len(n.pendingTXs))
@@ -273,14 +272,3 @@ func (n *Node) getPendingTXsAsArray() []database.Tx {
 	return txs
 }
 
-func (n *Node) getMiningTXsAsArray() []database.Tx {
-	txs := make([]database.Tx, len(n.miningTXs))
-
-	i := 0
-	for _, tx := range n.pendingTXs {
-		txs[i] = tx
-		i++
-	}
-
-	return txs
-}
