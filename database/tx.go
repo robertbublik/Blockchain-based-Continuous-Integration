@@ -16,17 +16,13 @@ type Tx struct {
 	From  		Account 	`json:"from"`
 	Value 		uint    	`json:"value"`
 	Repository  string  	`json:"repository"`
-	Commit 		20[byte] 	`json:"commit"`
-	prevCommit 	20[byte] 	`json:"prevCommit"`
+	Commit 		[20]byte 	`json:"commit"`
+	prevCommit 	[20]byte 	`json:"prevCommit"`
 	Time  		uint64  	`json:"time"`
 }
 
-func NewTx(from Account, value uint, repository string, commit 20[byte], prevCommit 20[byte]) Tx {
+func NewTx(from Account, value uint, repository string, commit [20]byte, prevCommit [20]byte) Tx {
 	return Tx{from, value, repository, commit, prevCommit, uint64(time.Now().Unix())}
-}
-
-func (t Tx) IsReward() bool {
-	return t.Data == "reward"
 }
 
 func (t Tx) Hash() (Hash, error) {
