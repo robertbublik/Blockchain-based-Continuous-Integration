@@ -63,12 +63,6 @@ func (n *Node) doSync() {
 			fmt.Printf("ERROR: %s\n", err)
 			continue
 		}
-
-		err = n.syncMiningTXs(peer, status.MiningTXs)
-		if err != nil {
-			fmt.Printf("ERROR: %s\n", err)
-			continue
-		}
 	}
 }
 
@@ -133,37 +127,10 @@ func (n *Node) syncPendingTXs(peer PeerNode, txs []database.Tx) error {
 			return err
 		}
 	}
-
 	return nil
 }
 
-func (n *Node) syncMiningTXs(peer PeerNode, txs []database.Tx) error {
-	for _, peer := range n.knownPeers {
-		if n.info.IP == peer.IP && n.info.Port == peer.Port {
-			continue
-		}
 
-		fmt.Printf("Searching for new Peers and their Blocks and Peers: '%s'\n", peer.TcpAddress())
-
-		status, err := queryPeerStatus(peer)
-		if err != nil {
-			fmt.Printf("ERROR: %s\n", err)
-			fmt.Printf("Peer '%s' was removed from KnownPeers\n", peer.TcpAddress())
-
-			n.RemovePeer(peer)
-
-			continue
-		}
-		for _, tx := range txs {
-			err := n.UpdateMiningTX(tx, peer)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-}
 
 func (n *Node) joinKnownPeers(peer PeerNode) error {
 	if peer.connected {
