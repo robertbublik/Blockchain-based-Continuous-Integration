@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"sort"
 )
 
 type State struct {
@@ -130,8 +129,6 @@ func (s *State) NextBlockIndex() uint64 {
 	return s.LatestBlock().Header.Index + 1
 }
 
-
-
 func (s *State) LatestBlock() Block {
 	return s.latestBlock
 }
@@ -172,47 +169,21 @@ func applyBlock(b Block, s *State) error {
 		return fmt.Errorf("next block parent hash must be '%x' not '%x'", s.latestBlockHash, b.Header.Parent)
 	}
 
-	hash, err := b.Hash()
+	err := applyTx(b.Body.TX, b.Header.Miner, s)
 	if err != nil {
 		return err
-	}
-
-	if !IsBlockHashValid(hash) {
-		return fmt.Errorf("invalid block hash %x", hash)
-	}
-
-	err = applyTXs(b.TXs, s)
-	if err != nil {
-		return err
-	}
-
-	s.Balances[b.Header.Miner] += BlockReward
-
-	return nil
-}
-
-func applyTXs(txs []Tx, s *State) error {
-	sort.Slice(txs, func(i, j int) bool {
-		return txs[i].Time < txs[j].Time
-	})
-
-	for _, tx := range txs {
-		err := applyTx(tx, s)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
 }
 
-func applyTx(tx Tx, s *State) error {
+func applyTx(tx Tx, miner Account, s *State) error {
 	if tx.Value > s.Balances[tx.From] {
 		return fmt.Errorf("wrong TX. Sender '%s' balance is %d BCI. Tx cost is %d BCI", tx.From, s.Balances[tx.From], tx.Value)
 	}
 
 	s.Balances[tx.From] -= tx.Value
-	s.Balances[tx.To] += tx.Value
+	s.Balances[miner] += tx.Value
 
 	return nil
 }
