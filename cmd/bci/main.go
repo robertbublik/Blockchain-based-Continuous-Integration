@@ -20,7 +20,6 @@ func main() {
 		},
 	}
 
-	bciCmd.AddCommand(migrateCmd())
 	bciCmd.AddCommand(versionCmd)
 	bciCmd.AddCommand(runCmd())
 	bciCmd.AddCommand(balancesCmd())
