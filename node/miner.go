@@ -2,10 +2,10 @@ package node
 
 import (
 	"context"
-	"fmt"
-	"github.com/web3coach/the-blockchain-bar/database"
-	"github.com/web3coach/the-blockchain-bar/fs"
-	"math/rand"
+	//"fmt"
+	"github.com/robertbublik/bci/database"
+	//"github.com/robertbublik/bci/fs"
+	//"math/rand"
 	"time"
 )
 
@@ -13,18 +13,23 @@ type PendingBlock struct {
 	index 		uint64
 	parent 		database.Hash
 	repository	string
-	commit 		20[byte]
-	prevCommit 	20[byte]
+	commit 		[20]byte
+	prevCommit 	[20]byte
 	time   		uint64
 	miner  		database.Account
 	tx    		database.Tx
 }
 
-func NewPendingBlock(index uint64, parent database.Hash, repository string, commit 20[byte], prevCommit 20[byte], miner database.Account, txs []database.Tx) PendingBlock {
+func NewPendingBlock(index uint64, parent database.Hash, repository string, commit [20]byte, prevCommit [20]byte, miner database.Account, tx database.Tx) PendingBlock {
 	return PendingBlock{index, parent, repository, commit, prevCommit, uint64(time.Now().Unix()), miner, tx}
 }
 
 func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
+	
+	var block database.Block
+	block = database.NewBlock(pb.index, pb.parent, pb.repository, pb.commit, pb.prevCommit, pb.time, pb.miner, pb.tx, "", "", "")
+	return block, nil
+
 	/* if len(pb.txs) == 0 {
 		return database.Block{}, fmt.Errorf("mining empty blocks is not allowed")
 	}
