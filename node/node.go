@@ -9,7 +9,7 @@ import (
 	//"time"
 )
 
-const DefaultMiner = ""
+const DefaultAccount = ""
 const DefaultIP = "127.0.0.1"
 const DefaultHTTPort = 8080
 const endpointStatus = "/node/status"
@@ -20,7 +20,7 @@ const endpointSyncQueryKeyFromBlock = "fromBlock"
 const endpointAddPeer = "/node/peer"
 const endpointAddPeerQueryKeyIP = "ip"
 const endpointAddPeerQueryKeyPort = "port"
-const endpointAddPeerQueryKeyMiner = "miner"
+const endpointAddPeerQueryKeyAccount = "account"
 
 const miningIntervalSeconds = 10
 

@@ -130,7 +130,7 @@ func syncHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 func addPeerHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	peerIP := r.URL.Query().Get(endpointAddPeerQueryKeyIP)
 	peerPortRaw := r.URL.Query().Get(endpointAddPeerQueryKeyPort)
-	minerRaw := r.URL.Query().Get(endpointAddPeerQueryKeyMiner)
+	accountRaw := r.URL.Query().Get(endpointAddPeerQueryKeyAccount)
 
 	peerPort, err := strconv.ParseUint(peerPortRaw, 10, 32)
 	if err != nil {
@@ -138,7 +138,7 @@ func addPeerHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 		return
 	}
 
-	peer := NewPeerNode(peerIP, peerPort, false, database.NewAccount(minerRaw), true)
+	peer := NewPeerNode(peerIP, peerPort, false, database.NewAccount(accountRaw), true)
 
 	node.AddPeer(peer)
 

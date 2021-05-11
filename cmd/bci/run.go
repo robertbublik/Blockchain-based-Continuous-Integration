@@ -38,7 +38,7 @@ func runCmd() *cobra.Command {
 	}
 
 	addDefaultRequiredFlags(runCmd)
-	runCmd.Flags().String(flagMiner, node.DefaultMiner, "miner account of this node to receive block rewards")
+	runCmd.Flags().String(flagAccount, node.DefaultAccount, "account of this node to receive block rewards")
 	runCmd.Flags().String(flagIP, node.DefaultIP, "exposed IP for communication with peers")
 	runCmd.Flags().Uint64(flagPort, node.DefaultHTTPort, "exposed HTTP port for communication with peers")
 
