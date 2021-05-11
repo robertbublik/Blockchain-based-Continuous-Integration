@@ -5,7 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
+	//"fmt"
 )
 
 //const BlockReward = 100
@@ -33,17 +33,24 @@ func (h Hash) IsEmpty() bool {
 
 type Block struct {
 	Header BlockHeader `json:"header"`
-	TXs    []Tx        `json:"payload"`
+	Body   BlockBody   `json:"body"`
 }
 
 type BlockHeader struct {
 	Index 		uint64  	`json:"index"`
 	Parent 		Hash    	`json:"parent"`
-	Repository	String		`json:"repository"`
-	Commit		20[byte]	`json:"commit"`
-	PrevCommit 	20[byte]	`json:"prevCommit"`
+	Repository	string		`json:"repository"`
+	Commit		[20]byte	`json:"commit"`
+	PrevCommit 	[20]byte	`json:"prevCommit"`
 	Time   		uint64  	`json:"time"`
 	Miner  		Account		`json:"miner"`
+}
+
+type BlockBody struct {
+	TX				Tx			`json:"tx"`
+	ArtifactUrl		string		`json:"artifactUrl`
+	ArtifactHash	string		`json:"artifactHash"`
+	BuildLog		string		`json:"buildLog"`
 }
 
 type BlockFS struct {
@@ -51,8 +58,8 @@ type BlockFS struct {
 	Value Block `json:"block"`
 }
 
-func NewBlock(index uint64, parent Hash, repository string, commit 20[byte], prevCommit 20[byte], time uint64, miner Account, txs []Tx) Block {
-	return Block{BlockHeader{index, parent, repository, commit, prevCommit, nonce, time, miner}, txs}
+func NewBlock(index uint64, parent Hash, repository string, commit [20]byte, prevCommit [20]byte, time uint64, miner Account, tx Tx, artifactUrl string, artifactHash string, buildLog string) Block {
+	return Block{BlockHeader{index, parent, repository, commit, prevCommit, time, miner}, BlockBody{tx, artifactUrl, artifactHash, buildLog}}
 }
 
 func (b Block) Hash() (Hash, error) {
