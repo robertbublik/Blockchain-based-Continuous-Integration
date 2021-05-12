@@ -131,7 +131,6 @@ func addPeerHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	peerIP := r.URL.Query().Get(endpointAddPeerQueryKeyIP)
 	peerPortRaw := r.URL.Query().Get(endpointAddPeerQueryKeyPort)
 	accountRaw := r.URL.Query().Get(endpointAddPeerQueryKeyAccount)
-
 	peerPort, err := strconv.ParseUint(peerPortRaw, 10, 32)
 	if err != nil {
 		writeRes(w, AddPeerRes{false, err.Error()})

@@ -9,7 +9,7 @@ import (
 )
 
 func (n *Node) sync(ctx context.Context) error {
-	ticker := time.NewTicker(45 * time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 
 	for {
 		select {
@@ -112,7 +112,6 @@ func (n *Node) syncKnownPeers(status StatusRes) error {
 	for _, statusPeer := range status.KnownPeers {
 		if !n.IsKnownPeer(statusPeer) {
 			fmt.Printf("Found new Peer %s\n", statusPeer.TcpAddress())
-
 			n.AddPeer(statusPeer)
 		}
 	}
@@ -138,15 +137,16 @@ func (n *Node) joinKnownPeers(peer PeerNode) error {
 	}
 
 	url := fmt.Sprintf(
-		"http://%s%s?%s=%s&%s=%d",
+		"http://%s%s?%s=%s&%s=%d&%s=%s",
 		peer.TcpAddress(),
 		endpointAddPeer,
 		endpointAddPeerQueryKeyIP,
 		n.info.IP,
 		endpointAddPeerQueryKeyPort,
 		n.info.Port,
+		endpointAddPeerQueryKeyAccount,
+		n.info.Account,
 	)
-
 	res, err := http.Get(url)
 	if err != nil {
 		return err
@@ -163,7 +163,6 @@ func (n *Node) joinKnownPeers(peer PeerNode) error {
 
 	knownPeer := n.knownPeers[peer.TcpAddress()]
 	knownPeer.connected = addPeerRes.Success
-
 	n.AddPeer(knownPeer)
 
 	if !addPeerRes.Success {

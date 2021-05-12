@@ -22,12 +22,12 @@ func runCmd() *cobra.Command {
 
 			bootstrap := node.NewPeerNode(
 				"127.0.0.1",
-				8070,
+				8080,
 				true,
 				database.NewAccount("bootstrap"),
 				false,
 			)
-
+			fmt.Printf("Starting with account: %s\n", account)
 			n := node.New(getDataDirFromCmd(cmd), ip, port, database.NewAccount(account), bootstrap)
 			err := n.Run(context.Background())
 			if err != nil {
