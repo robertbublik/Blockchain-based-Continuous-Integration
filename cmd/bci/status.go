@@ -1,12 +1,13 @@
 package main
 
 import (
-/* 	"fmt"
-	"net/http" */
+	"fmt"
+	"net/http"
 	"github.com/spf13/cobra"
 	"github.com/robertbublik/bci/node"
-/* 	"os" */
-	//"encoding/json"
+	"os"
+	"encoding/json"
+	"io/ioutil"
 )
 
 func statusCmd() *cobra.Command {
@@ -14,40 +15,23 @@ func statusCmd() *cobra.Command {
 		Use:   "status",
 		Short: "Displays status of BCI.",
 		Run: func(cmd *cobra.Command, args []string) {
-			/* res, err := http.Get("http://localhost:8080/node/status")
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			} */
-			tools.Test()
-			//txListRes := node.TxsListRes{}
-			
-			/* err = utils.ReadRes(res, &txListRes)
+			res, err := http.Get("http://localhost:8080/node/status")
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
-			json.MarshalIndent(txListRes, "", "\t") */
+
+			statusRes := node.StatusRes{}
+			err = node.ReadRes(res, &statusRes)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+			b, err := json.MarshalIndent(statusRes, "", "\t")
+			fmt.Println(string(b))
 			
 		},
 	}
 
 	return statusCmd
 }
-
-/* func HandleRequest(w http.ResponseWriter, req *http.Request) {
-    body := App.MustReadBody(req, w)
-    if body == nil {
-        return
-    }
-
-    var prettyJSON bytes.Buffer
-    error := json.Indent(&prettyJSON, body, "", "\t")
-    if error != nil {
-        log.Println("JSON parse error: ", error)
-        App.BadRequest(w)
-        return
-    }
-
-    log.Println(string(prettyJSON.Bytes()))
-} */

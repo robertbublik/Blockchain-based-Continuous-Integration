@@ -7,10 +7,6 @@ import (
 	"fmt"
 )
 
-func Test() {
-	fmt.Printf("test")
-}
-
 func WriteErrRes(w http.ResponseWriter, err error) {
 	jsonErrRes, _ := json.Marshal(ErrRes{err.Error()})
 	w.Header().Set("Content-Type", "application/json")
