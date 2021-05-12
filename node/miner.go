@@ -13,14 +13,14 @@ type PendingBlock struct {
 	index 		uint64
 	parent 		database.Hash
 	repository	string
-	commit 		[20]byte
-	prevCommit 	[20]byte
+	commit 		string
+	prevCommit 	string
 	time   		uint64
 	miner  		database.Account
 	tx    		database.Tx
 }
 
-func NewPendingBlock(index uint64, parent database.Hash, repository string, commit [20]byte, prevCommit [20]byte, miner database.Account, tx database.Tx) PendingBlock {
+func NewPendingBlock(index uint64, parent database.Hash, repository string, commit string, prevCommit string, miner database.Account, tx database.Tx) PendingBlock {
 	return PendingBlock{index, parent, repository, commit, prevCommit, uint64(time.Now().Unix()), miner, tx}
 }
 

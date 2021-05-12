@@ -40,8 +40,8 @@ type BlockHeader struct {
 	Index 		uint64  	`json:"index"`
 	Parent 		Hash    	`json:"parent"`
 	Repository	string		`json:"repository"`
-	Commit		[20]byte	`json:"commit"`
-	PrevCommit 	[20]byte	`json:"prevCommit"`
+	Commit		string		`json:"commit"`
+	PrevCommit 	string		`json:"prevCommit"`
 	Time   		uint64  	`json:"time"`
 	Miner  		Account		`json:"miner"`
 }
@@ -58,7 +58,7 @@ type BlockFS struct {
 	Value Block `json:"block"`
 }
 
-func NewBlock(index uint64, parent Hash, repository string, commit [20]byte, prevCommit [20]byte, time uint64, miner Account, tx Tx, artifactUrl string, artifactHash string, buildLog string) Block {
+func NewBlock(index uint64, parent Hash, repository string, commit string, prevCommit string, time uint64, miner Account, tx Tx, artifactUrl string, artifactHash string, buildLog string) Block {
 	return Block{BlockHeader{index, parent, repository, commit, prevCommit, time, miner}, BlockBody{tx, artifactUrl, artifactHash, buildLog}}
 }
 

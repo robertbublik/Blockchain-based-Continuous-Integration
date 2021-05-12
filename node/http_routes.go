@@ -22,11 +22,11 @@ type PendingTxRes struct {
 
 type TxReq struct {
 	From  		string 	`json:"from"`
-	Value 		uint    			`json:"value"`
-	Repository  string  			`json:"repository"`
-	Commit 		[20]byte 			`json:"commit"`
-	prevCommit 	[20]byte 			`json:"prevCommit"`
-	Time  		uint64  			`json:"time"`
+	Value 		uint   	`json:"value"`
+	Repository  string  `json:"repository"`
+	Commit 		string 	`json:"commit"`
+	prevCommit 	string 	`json:"prevCommit"`
+	Time  		uint64  `json:"time"`
 }
 
 type TxAddRes struct {
