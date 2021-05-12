@@ -23,6 +23,7 @@ func main() {
 	bciCmd.AddCommand(versionCmd)
 	bciCmd.AddCommand(runCmd())
 	bciCmd.AddCommand(balancesCmd())
+	bciCmd.AddCommand(statusCmd())
 
 	err := bciCmd.Execute()
 	if err != nil {
@@ -44,4 +45,8 @@ func getDataDirFromCmd(cmd *cobra.Command) string {
 
 func incorrectUsageErr() error {
 	return fmt.Errorf("incorrect usage")
+}
+
+func connectionErr() error {
+	return fmt.Errorf("connection error")
 }

@@ -93,9 +93,9 @@ func (n *Node) Run(ctx context.Context) error {
 		listBalancesHandler(w, r, state)
 	})
 
-	http.HandleFunc("/tx/list", func(w http.ResponseWriter, r *http.Request) {
+/* 	http.HandleFunc("/tx/list", func(w http.ResponseWriter, r *http.Request) {
 		listPendingTxHandler(w, r, n)
-	})
+	}) */
 
 	http.HandleFunc("/tx/add", func(w http.ResponseWriter, r *http.Request) {
 		txAddHandler(w, r, n)

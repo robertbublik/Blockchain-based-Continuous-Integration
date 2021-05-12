@@ -153,7 +153,7 @@ func (n *Node) joinKnownPeers(peer PeerNode) error {
 	}
 
 	addPeerRes := AddPeerRes{}
-	err = readRes(res, &addPeerRes)
+	err = ReadRes(res, &addPeerRes)
 	if err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func queryPeerStatus(peer PeerNode) (StatusRes, error) {
 	}
 
 	statusRes := StatusRes{}
-	err = readRes(res, &statusRes)
+	err = ReadRes(res, &statusRes)
 	if err != nil {
 		return StatusRes{}, err
 	}
@@ -205,7 +205,7 @@ func fetchBlocksFromPeer(peer PeerNode, fromBlock database.Hash) ([]database.Blo
 	}
 
 	syncRes := SyncRes{}
-	err = readRes(res, &syncRes)
+	err = ReadRes(res, &syncRes)
 	if err != nil {
 		return nil, err
 	}
