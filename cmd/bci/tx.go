@@ -62,11 +62,12 @@ func txAddCmd() *cobra.Command {
 			from, _ := cmd.Flags().GetString(flagFrom)
 			value, _ := cmd.Flags().GetUint64(flagValue)
 			repository, _ := cmd.Flags().GetString(flagRepository)
+			language, _ := cmd.Flags().GetString(flagLanguage)
 			commit, _ := cmd.Flags().GetString(flagCommit)
 			prevCommit, _ := cmd.Flags().GetString(flagPrevCommit)
 
 
-			tx := node.TxReq{from, value, repository, commit, prevCommit, uint64(time.Now().Unix())}
+			tx := node.TxReq{from, value, repository, language, commit, prevCommit, uint64(time.Now().Unix())}
 			payloadBytes, err := json.Marshal(tx)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -90,6 +91,7 @@ func txAddCmd() *cobra.Command {
 	addDefaultStringRequiredFlags(txAddCmd, flagFrom, "", "Account name of developer submitting a transaction")
 	addDefaultUint64RequiredFlags(txAddCmd, flagValue, 0, "Value of the transaction's reward")
 	addDefaultStringRequiredFlags(txAddCmd, flagRepository, "", "URL of the repository")
+	addDefaultStringRequiredFlags(txAddCmd, flagLanguage, "", "Java, Docker")
 	addDefaultStringRequiredFlags(txAddCmd, flagCommit, "", "Requested commit hash of repository to checkout")
 	txAddCmd.Flags().String(flagPrevCommit, "", "Link transaction to an earlier build in the BCI through the previously used commit hash")
 	return txAddCmd

@@ -22,12 +22,13 @@ type TxsListRes struct {
 }
 
 type TxReq struct {
-	From  		string 	`json:"from"`
-	Value 		uint64 	`json:"value"`
-	Repository  string  `json:"repository"`
-	Commit 		string 	`json:"commit"`
-	PrevCommit 	string 	`json:"prevCommit"`
-	Time  		uint64  `json:"time"`
+	From  			string 	`json:"from"`
+	Value 			uint64 	`json:"value"`
+	Repository  	string  `json:"repository"`
+	Language	 	string	`json:"language`
+	Commit 			string 	`json:"commit"`
+	PrevCommit 		string 	`json:"prevCommit"`
+	Time  			uint64  `json:"time"`
 }
 
 type TxAddRes struct {
@@ -72,10 +73,11 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	}
 
 	if req.Value > node.state.Balances[database.NewAccount(req.From)] {
-		WriteErrRes(w, errors.New("Balance too low."))
+		err := errors.New("Balance too low.")
+		WriteErrRes(w, err)
 		return
 	}
-	tx := database.NewTx(database.NewAccount(req.From), req.Value, req.Repository, req.Commit, req.PrevCommit)
+	tx := database.NewTx(database.NewAccount(req.From), req.Value, req.Repository, req.Language, req.Commit, req.PrevCommit)
 	err = node.AddPendingTX(tx, node.info)
 	if err != nil {
 		WriteErrRes(w, err)
