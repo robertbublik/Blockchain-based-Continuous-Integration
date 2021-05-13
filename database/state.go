@@ -15,6 +15,8 @@ type State struct {
 
 	latestBlock     Block
 	latestBlockHash Hash
+/* 	latestTx		Tx
+	latestTxId		uint64 */
 	hasGenesisBlock bool
 }
 
@@ -28,6 +30,11 @@ func NewStateFromDisk(dataDir string) (*State, error) {
 	if err != nil {
 		return nil, err
 	}
+/* 
+	txs, err := loadTransactions(getTxDbFilePath(dataDir))
+	if err != nil {
+		return nil, err
+	} */
 
 	balances := make(map[Account]uint64)
 	for account, balance := range gen.Balances {
@@ -136,6 +143,18 @@ func (s *State) LatestBlock() Block {
 func (s *State) LatestBlockHash() Hash {
 	return s.latestBlockHash
 }
+/* 
+func (s *State) NextTxIndex() uint64 {
+	return s.LatestTx().Id + 1
+}
+
+func (s *State) LatestTx() Tx {
+	return s.latestTx
+}
+
+func (s *State) LatestTxId() uint64 {
+	return s.latestTx.Id
+} */
 
 func (s *State) Close() error {
 	return s.dbFile.Close()

@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"os"
 	"io/ioutil"
+	//"github.com/robertbublik/bci/node"
 )
 
 func initDataDirIfNotExists(dataDir string) error {
@@ -23,6 +24,10 @@ func initDataDirIfNotExists(dataDir string) error {
 		return err
 	}
 
+/* 	if err := writeEmptyTxDbToDisk(getBlocksDbFilePath(dataDir)); err != nil {
+		return err
+	} */
+
 	return nil
 }
 
@@ -37,6 +42,10 @@ func getGenesisJsonFilePath(dataDir string) string {
 func getBlocksDbFilePath(dataDir string) string {
 	return filepath.Join(getDatabaseDirPath(dataDir), "block.db")
 }
+
+/* func getTxDbFilePath(dataDir string) string {
+	return filepath.Join(getDatabaseDirPath(dataDir), "tx.db")
+} */
 
 func fileExist(filePath string) bool {
 	_, err := os.Stat(filePath)
@@ -62,3 +71,22 @@ func dirExists(path string) (bool, error) {
 func writeEmptyBlocksDbToDisk(path string) error {
 	return ioutil.WriteFile(path, []byte(""), os.ModePerm)
 }
+
+/* func loadTransactions(path string) (txs, error) {
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return node.TxsListRes{}, err
+	}
+
+	var loadedTxs txs
+	err = json.Unmarshal(content, &loadedGenesis)
+	if err != nil {
+		return genesis{}, err
+	}
+
+	return loadedGenesis, nil
+}
+
+func writeEmptyTxDbToDisk(path string) error {
+	return ioutil.WriteFile(path, []byte(""), os.ModePerm)
+} */

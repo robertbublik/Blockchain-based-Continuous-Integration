@@ -13,6 +13,7 @@ func NewAccount(value string) Account {
 }
 
 type Tx struct {
+	Id			string		`json:"id"`
 	From  		Account 	`json:"from"`
 	Value 		uint64    	`json:"value"`
 	Repository  string  	`json:"repository"`
@@ -22,8 +23,8 @@ type Tx struct {
 	Time  		uint64  	`json:"time"`
 }
 
-func NewTx(from Account, value uint64, repository string, language string, commit string, prevCommit string) Tx {
-	return Tx{from, value, repository, language, commit, prevCommit, uint64(time.Now().Unix())}
+func NewTx(id string, from Account, value uint64, repository string, language string, commit string, prevCommit string) Tx {
+	return Tx{id, from, value, repository, language, commit, prevCommit, uint64(time.Now().Unix())}
 }
 
 func (t Tx) Hash() (Hash, error) {
@@ -34,3 +35,4 @@ func (t Tx) Hash() (Hash, error) {
 
 	return sha256.Sum256(txJson), nil
 }
+

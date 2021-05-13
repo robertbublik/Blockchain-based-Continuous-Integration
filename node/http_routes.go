@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"errors"
+	"crypto/sha256"
+	"encoding/hex"
 )
 
 type ErrRes struct {
@@ -13,22 +15,22 @@ type ErrRes struct {
 }
 
 type BalancesRes struct {
-	Hash     database.Hash             `json:"blockHash"`
-	Balances map[database.Account]uint64 `json:"balances"`
+	Hash     database.Hash             		`json:"blockHash"`
+	Balances map[database.Account]uint64 	`json:"balances"`
 }
 
 type TxsListRes struct {
-	TXsList		[]database.Tx		   `json:"txsList"`		
+	TXsList		[]database.Tx	`json:"txsList"`		
 }
 
 type TxReq struct {
-	From  			string 	`json:"from"`
-	Value 			uint64 	`json:"value"`
-	Repository  	string  `json:"repository"`
-	Language	 	string	`json:"language`
-	Commit 			string 	`json:"commit"`
-	PrevCommit 		string 	`json:"prevCommit"`
-	Time  			uint64  `json:"time"`
+	From  		string 	`json:"from"`
+	Value 		uint64 	`json:"value"`
+	Repository  string  `json:"repository"`
+	Language	string	`json:"language`
+	Commit 		string 	`json:"commit"`
+	PrevCommit 	string 	`json:"prevCommit"`
+	Time  		uint64  `json:"time"`
 }
 
 type TxAddRes struct {
@@ -77,7 +79,11 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 		WriteErrRes(w, err)
 		return
 	}
-	tx := database.NewTx(database.NewAccount(req.From), req.Value, req.Repository, req.Language, req.Commit, req.PrevCommit)
+
+	txHash := sha256.Sum256([]byte(req.From + strconv.FormatUint(req.Value, 10) + req.Repository + req.Language + req.Commit + req.PrevCommit))
+	txId := hex.EncodeToString(txHash[:])[:5]
+	tx := database.NewTx(txId, database.NewAccount(req.From), req.Value, req.Repository, req.Language, req.Commit, req.PrevCommit)
+	
 	err = node.AddPendingTX(tx, node.info)
 	if err != nil {
 		WriteErrRes(w, err)
