@@ -35,8 +35,12 @@ type TxAddRes struct {
 	Success bool `json:"success"`
 }
 
-type TxMineRes struct {
-	Success bool `json:"success"`
+type CliRes struct {
+	Response string `json:"response"`
+}
+
+type TxMineReq struct {
+	Id	string	`json:"id"`
 }
 
 type StatusRes struct {
@@ -73,12 +77,19 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	}
 
 	if req.Value > node.state.Balances[database.NewAccount(req.From)] {
-		err := errors.New("Balance too low.")
+		err := errors.New("Balance too low.\n")
 		WriteErrRes(w, err)
 		return
 	}
 	
-	tx := database.NewTx(TxRequestToString(req), database.NewAccount(req.From), req.Value, req.Repository, req.Language, req.Commit, req.PrevCommit)
+	id := TxRequestToString(req)
+	if node.IsAlreadyPending(id) {
+		err := errors.New("Transaction already exists\n")
+		WriteErrRes(w, err)
+		return
+	}
+
+	tx := database.NewTx(id, database.NewAccount(req.From), req.Value, req.Repository, req.Language, req.Commit, req.PrevCommit)
 
 	err = node.AddPendingTX(tx, node.info)
 	if err != nil {
@@ -86,20 +97,24 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 		return
 	}
 
-	WriteRes(w, TxAddRes{Success: true})
-	fmt.Printf("Tx added succesfully\n")
+	WriteRes(w, CliRes{Response: "Transaction added succesfully\n"})
 }
 
 // worker chooses transaction to mine
 func txMineHandler(w http.ResponseWriter, r *http.Request, node *Node) {
-	req := TxReq{}
+	req := TxMineReq{}
 	err := ReadReq(r, &req)
 	if err != nil {
 		WriteErrRes(w, err)
 		return
 	}
+	if !node.IsAlreadyPending(req.Id) {
+		err := errors.New("Transaction doesn't exist\n")
+		WriteErrRes(w, err)
+		return
+	}
 
-	WriteRes(w, TxAddRes{Success: true})
+	WriteRes(w, CliRes{Response: "Transaction mined succesfully"})
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request, node *Node) {

@@ -268,6 +268,15 @@ func (n *Node) getPendingTXsAsArray() []database.Tx {
 	return txs
 }
 
+func (n *Node) IsAlreadyPending(id string) bool {
+	for _, tx := range n.pendingTXs {
+		if tx.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
 func TxRequestToString(req TxReq) string {
 	txHash := sha256.Sum256([]byte(req.From + strconv.FormatUint(req.Value, 10) + req.Repository + req.Language + req.Commit + req.PrevCommit))
 	return hex.EncodeToString(txHash[:])[:5]

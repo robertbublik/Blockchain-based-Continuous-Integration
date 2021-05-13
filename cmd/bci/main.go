@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/robertbublik/bci/fs"
+	"github.com/robertbublik/bci/node"
 	"os"
+	"net/http"
 )
 
 const flagDataDir = "datadir"
@@ -17,6 +19,7 @@ const flagRepository = "repository"
 const flagLanguage = "language"
 const flagCommit = "commit"
 const flagPrevCommit = "prevCommit"
+const flagId = "id"
 
 func main() {
 	var bciCmd = &cobra.Command{
@@ -62,4 +65,19 @@ func incorrectUsageErr() error {
 
 func connectionErr() error {
 	return fmt.Errorf("connection error")
+}
+
+func printResponse(r *http.Response) {
+	responseGeneric := map[string]interface{}{}
+	node.ReadRes(r, &responseGeneric)
+	for key,value := range responseGeneric {
+		switch key {
+		case "response":
+			fmt.Println(value)
+		case "error":
+			fmt.Println(value)
+		default:
+			fmt.Printf("Unknown response")
+		}
+	}
 }
