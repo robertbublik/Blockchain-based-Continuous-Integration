@@ -37,7 +37,7 @@ func runCmd() *cobra.Command {
 		},
 	}
 
-	addDefaultRequiredFlags(runCmd)
+	addDefaultStringRequiredFlags(runCmd, flagDataDir, "", "Absolute path to the node data dir where the DB will/is stored")
 	runCmd.Flags().String(flagAccount, node.DefaultAccount, "account of this node to receive block rewards")
 	runCmd.Flags().String(flagIP, node.DefaultIP, "exposed IP for communication with peers")
 	runCmd.Flags().Uint64(flagPort, node.DefaultHTTPort, "exposed HTTP port for communication with peers")

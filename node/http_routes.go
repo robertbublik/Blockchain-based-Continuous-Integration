@@ -5,6 +5,7 @@ import (
 	"github.com/robertbublik/bci/database"
 	"net/http"
 	"strconv"
+	"errors"
 )
 
 type ErrRes struct {
@@ -13,19 +14,19 @@ type ErrRes struct {
 
 type BalancesRes struct {
 	Hash     database.Hash             `json:"blockHash"`
-	Balances map[database.Account]uint `json:"balances"`
+	Balances map[database.Account]uint64 `json:"balances"`
 }
 
 type TxsListRes struct {
-	TXsList		[]database.Tx		`json:"pendingTxs"`		
+	TXsList		[]database.Tx		   `json:"txsList"`		
 }
 
 type TxReq struct {
 	From  		string 	`json:"from"`
-	Value 		uint   	`json:"value"`
+	Value 		uint64 	`json:"value"`
 	Repository  string  `json:"repository"`
 	Commit 		string 	`json:"commit"`
-	prevCommit 	string 	`json:"prevCommit"`
+	PrevCommit 	string 	`json:"prevCommit"`
 	Time  		uint64  `json:"time"`
 }
 
@@ -57,9 +58,9 @@ func listBalancesHandler(w http.ResponseWriter, r *http.Request, state *database
 	WriteRes(w, BalancesRes{state.LatestBlockHash(), state.Balances})
 }
 
-/* func listPendingTxHandler(w http.ResponseWriter, r *http.Request, node *Node) {
-	WriteRes(w, PendingTxRes{node.getPendingTXsAsArray()})
-} */
+func listTxHandler(w http.ResponseWriter, r *http.Request, node *Node) {
+	WriteRes(w, TxsListRes{node.getPendingTXsAsArray()})
+}
 
 // adds transaction to BCI
 func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
@@ -71,11 +72,10 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	}
 
 	if req.Value > node.state.Balances[database.NewAccount(req.From)] {
-		WriteErrRes(w, fmt.Errorf("Balance too low. %s", err.Error()))
+		WriteErrRes(w, errors.New("Balance too low."))
 		return
 	}
-
-	tx := database.NewTx(database.NewAccount(req.From), req.Value, req.Repository, req.Commit, req.prevCommit)
+	tx := database.NewTx(database.NewAccount(req.From), req.Value, req.Repository, req.Commit, req.PrevCommit)
 	err = node.AddPendingTX(tx, node.info)
 	if err != nil {
 		WriteErrRes(w, err)
@@ -83,6 +83,7 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	}
 
 	WriteRes(w, TxAddRes{Success: true})
+	fmt.Printf("Tx added succesfully\n")
 }
 
 // worker chooses transaction to mine

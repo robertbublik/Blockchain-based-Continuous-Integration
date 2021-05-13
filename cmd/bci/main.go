@@ -11,12 +11,18 @@ const flagDataDir = "datadir"
 const flagAccount = "account"
 const flagIP = "ip"
 const flagPort = "port"
+const flagFrom = "from"
+const flagValue = "value"
+const flagRepository = "repository"
+const flagCommit = "commit"
+const flagPrevCommit = "prevCommit"
 
 func main() {
 	var bciCmd = &cobra.Command{
 		Use:   "bci",
 		Short: "Blockchain-based Continuous Integration CLI",
 		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("test")
 		},
 	}
 
@@ -24,6 +30,7 @@ func main() {
 	bciCmd.AddCommand(runCmd())
 	bciCmd.AddCommand(balancesCmd())
 	bciCmd.AddCommand(statusCmd())
+	bciCmd.AddCommand(txCmd())
 
 	err := bciCmd.Execute()
 	if err != nil {
@@ -32,9 +39,14 @@ func main() {
 	}
 }
 
-func addDefaultRequiredFlags(cmd *cobra.Command) {
-	cmd.Flags().String(flagDataDir, "", "Absolute path to the node data dir where the DB will/is stored")
-	cmd.MarkFlagRequired(flagDataDir)
+func addDefaultStringRequiredFlags(cmd *cobra.Command, flag string, defaultValue string, help string) {
+	cmd.Flags().String(flag, defaultValue, help)
+	cmd.MarkFlagRequired(flag)
+}
+
+func addDefaultUint64RequiredFlags(cmd *cobra.Command, flag string, defaultValue uint64, help string) {
+	cmd.Flags().Uint64(flag, defaultValue, help)
+	cmd.MarkFlagRequired(flag)
 }
 
 func getDataDirFromCmd(cmd *cobra.Command) string {

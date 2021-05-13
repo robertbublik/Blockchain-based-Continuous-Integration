@@ -44,7 +44,7 @@ func balancesListCmd() *cobra.Command {
 		},
 	}
 
-	addDefaultRequiredFlags(balancesListCmd)
+	addDefaultStringRequiredFlags(balancesListCmd, flagDataDir, "", "Absolute path to the node data dir where the DB will/is stored")
 
 	return balancesListCmd
 }

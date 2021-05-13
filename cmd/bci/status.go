@@ -7,7 +7,6 @@ import (
 	"github.com/robertbublik/bci/node"
 	"os"
 	"encoding/json"
-	"io/ioutil"
 )
 
 func statusCmd() *cobra.Command {

@@ -9,7 +9,7 @@ import (
 )
 
 type State struct {
-	Balances map[Account]uint
+	Balances map[Account]uint64
 
 	dbFile *os.File
 
@@ -29,7 +29,7 @@ func NewStateFromDisk(dataDir string) (*State, error) {
 		return nil, err
 	}
 
-	balances := make(map[Account]uint)
+	balances := make(map[Account]uint64)
 	for account, balance := range gen.Balances {
 		balances[account] = balance
 	}
@@ -146,7 +146,7 @@ func (s *State) copy() State {
 	c.hasGenesisBlock = s.hasGenesisBlock
 	c.latestBlock = s.latestBlock
 	c.latestBlockHash = s.latestBlockHash
-	c.Balances = make(map[Account]uint)
+	c.Balances = make(map[Account]uint64)
 
 	for acc, balance := range s.Balances {
 		c.Balances[acc] = balance

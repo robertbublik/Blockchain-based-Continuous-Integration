@@ -20,7 +20,7 @@ var genesisJson = `
 }`
 
 type genesis struct {
-	Balances map[Account]uint `json:"balances"`
+	Balances map[Account]uint64 `json:"balances"`
 }
 
 func loadGenesis(path string) (genesis, error) {

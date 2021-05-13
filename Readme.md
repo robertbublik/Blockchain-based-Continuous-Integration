@@ -258,12 +258,12 @@ Usage:
 Flags:
       --bootstrap-account string   default bootstrap Web3Coach's Genesis account with 1M TBB tokens (default "0x09ee50f2f37fcba1845de6fe5c762e83e65e755c")
       --bootstrap-ip string        default bootstrap Web3Coach's server to interconnect peers (default "node.tbb.web3.coach")
-      --bootstrap-port uint        default bootstrap Web3Coach's server port to interconnect peers (default 8080)
+      --bootstrap-port uint64        default bootstrap Web3Coach's server port to interconnect peers (default 8080)
       --datadir string             Absolute path to your node's data dir where the DB will be/is stored
   -h, --help                       help for run
       --ip string                  your node's public IP to communication with other peers (default "127.0.0.1")
       --miner string               your node's miner account to receive the block rewards (default "0x0000000000000000000000000000000000000000")
-      --port uint                  your node's public HTTP port for communication with other peers (default 8080)
+      --port uint64                  your node's public HTTP port for communication with other peers (default 8080)
 ```
 
 ### Run a TBB node connected to the official book's test network 
