@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"strconv"
 	"errors"
-	"crypto/sha256"
-	"encoding/hex"
 )
 
 type ErrRes struct {
@@ -79,11 +77,9 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 		WriteErrRes(w, err)
 		return
 	}
-
-	txHash := sha256.Sum256([]byte(req.From + strconv.FormatUint(req.Value, 10) + req.Repository + req.Language + req.Commit + req.PrevCommit))
-	txId := hex.EncodeToString(txHash[:])[:5]
-	tx := database.NewTx(txId, database.NewAccount(req.From), req.Value, req.Repository, req.Language, req.Commit, req.PrevCommit)
 	
+	tx := database.NewTx(TxRequestToString(req), database.NewAccount(req.From), req.Value, req.Repository, req.Language, req.Commit, req.PrevCommit)
+
 	err = node.AddPendingTX(tx, node.info)
 	if err != nil {
 		WriteErrRes(w, err)

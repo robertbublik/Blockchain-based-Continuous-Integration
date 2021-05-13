@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"github.com/robertbublik/bci/database"
 	"net/http"
+	"crypto/sha256"
+	"encoding/hex"
+	"strconv"
 	//"time"
 )
 
@@ -265,3 +268,7 @@ func (n *Node) getPendingTXsAsArray() []database.Tx {
 	return txs
 }
 
+func TxRequestToString(req TxReq) string {
+	txHash := sha256.Sum256([]byte(req.From + strconv.FormatUint(req.Value, 10) + req.Repository + req.Language + req.Commit + req.PrevCommit))
+	return hex.EncodeToString(txHash[:])[:5]
+}
