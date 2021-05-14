@@ -140,78 +140,7 @@ func (n *Node) LatestBlockHash() database.Hash {
 	return n.state.LatestBlockHash()
 }
 // TODO: change algorithm to CI
-/* func (n *Node) mine(ctx context.Context) error {
-	var miningCtx context.Context
-	var stopCurrentMining context.CancelFunc
 
-	ticker := time.NewTicker(time.Second * miningIntervalSeconds)
-
-	for {
-		select {
-		case <-ticker.C:
-			go func() {
-				if len(n.pendingTXs) > 0 && !n.isMining {
-					n.isMining = true
-
-					miningCtx, stopCurrentMining = context.WithCancel(ctx)
-					err := n.minePendingTXs(miningCtx)
-					if err != nil {
-						fmt.Printf("ERROR: %s\n", err)
-					}
-
-					n.isMining = false
-				}
-			}()
-
-		case block, _ := <-n.newSyncedBlocks:
-			if n.isMining {
-				blockHash, _ := block.Hash()
-				fmt.Printf("\nPeer mined next Block '%s' faster :(\n", blockHash.Hex())
-
-				n.removeMinedPendingTXs(block)
-				stopCurrentMining()
-			}
-
-		case <-ctx.Done():
-			ticker.Stop()
-			return nil
-		}
-	}
-} */
-
-/* func (n *Node) minePendingTXs(ctx context.Context) error {
-	blockToMine := NewPendingBlock(
-		n.state.LatestBlockHash(),
-		n.state.NextBlockNumber(),
-		n.info.Account,
-		n.getPendingTXsAsArray(),
-	)
-
-	minedBlock, err := Mine(ctx, blockToMine)
-	if err != nil {
-		return err
-	}
-
-	n.removeMinedPendingTXs(minedBlock)
-
-	_, err = n.state.AddBlock(minedBlock)
-	if err != nil {
-		return err
-	}
-
-	return nil
-} */
-
-
-func (n *Node) removeMinedPendingTXs(block database.Block) {
-	txHash, _ := block.Body.TX.Hash()
-	if _, exists := n.pendingTXs[txHash.Hex()]; exists {
-		fmt.Printf("\t-archiving mined TX: %s\n", txHash.Hex())
-
-		n.archivedTXs[txHash.Hex()] = block.Body.TX
-		delete(n.pendingTXs, txHash.Hex())
-	}
-}
 
 func (n *Node) AddPeer(peer PeerNode) {
 	n.knownPeers[peer.TcpAddress()] = peer
@@ -254,6 +183,16 @@ func (n *Node) AddPendingTX(tx database.Tx, fromPeer PeerNode) error {
 	return nil
 }
 
+
+func (n *Node) GetTx(id string) database.Tx {
+	for _, tx := range n.pendingTXs {
+		if tx.Id == id {
+			return tx
+		}
+	}
+
+	return database.Tx{}
+}
 
 
 func (n *Node) getPendingTXsAsArray() []database.Tx {

@@ -43,6 +43,10 @@ type TxMineReq struct {
 	Id	string	`json:"id"`
 }
 
+type TxMineRes struct {
+	TX	database.Tx	`json:"tx"`
+}
+
 type StatusRes struct {
 	Hash       	database.Hash       `json:"blockHash"`
 	BlockIndex 	uint64              `json:"blockIndex"`
@@ -97,7 +101,7 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 		return
 	}
 
-	WriteRes(w, CliRes{Response: "Transaction added succesfully\n"})
+	WriteRes(w, CliRes{Response: "Transaction added succesfully"})
 }
 
 // worker chooses transaction to mine
@@ -109,12 +113,14 @@ func txMineHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 		return
 	}
 	if !node.IsAlreadyPending(req.Id) {
-		err := errors.New("Transaction doesn't exist\n")
+		err := errors.New("Transaction doesn't exist")
 		WriteErrRes(w, err)
 		return
 	}
 
-	WriteRes(w, CliRes{Response: "Transaction mined succesfully"})
+	tx := node.GetTx(req.Id)
+
+	WriteRes(w, TxMineRes{TX: tx})
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request, node *Node) {

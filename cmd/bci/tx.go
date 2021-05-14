@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"github.com/spf13/cobra"
 	"github.com/robertbublik/bci/node"
+	"github.com/robertbublik/bci/mine"
 	"os"
 	"encoding/json"
 	"bytes"
@@ -76,28 +77,26 @@ func txAddCmd() *cobra.Command {
 			body := bytes.NewReader(payloadBytes)
 			req, err := http.NewRequest("POST", "http://127.0.0.1:8080/tx/add", body)
 			if err != nil {
-				fmt.Printf("1")
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 			req.Header.Set("Content-Type", "application/json")
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
-				fmt.Printf("2")
 				fmt.Println(err)
 				os.Exit(1)
 			}
 
 			printResponse(resp)
 
-			defer resp.Body.Close() */
+			defer resp.Body.Close()
 		},
 	}
 	addDefaultStringRequiredFlags(txAddCmd, flagFrom, "", "Account name of developer submitting a transaction")
 	addDefaultUint64RequiredFlags(txAddCmd, flagValue, 0, "Value of the transaction's reward")
 	addDefaultStringRequiredFlags(txAddCmd, flagRepository, "", "URL of the repository")
 	addDefaultStringRequiredFlags(txAddCmd, flagLanguage, "", "Java, Docker")
-	addDefaultStringRequiredFlags(txAddCmd, flagCommit, "", "Requested commit hash of repository to checkout")
+	txAddCmd.Flags().String(flagCommit, "", "Requested commit hash of repository to checkout")
 	txAddCmd.Flags().String(flagPrevCommit, "", "Link transaction to an earlier build in the BCI through the previously used commit hash")
 	return txAddCmd
 }
@@ -109,8 +108,8 @@ func txMineCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			id, _ := cmd.Flags().GetString(flagId)
 
-			txReq := node.TxMineReq{id}
-			payloadBytes, err := json.Marshal(txReq)
+			txIdReq := node.TxMineReq{id}
+			payloadBytes, err := json.Marshal(txIdReq)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
@@ -127,6 +126,14 @@ func txMineCmd() *cobra.Command {
 				fmt.Println(err)
 				os.Exit(1)
 			}
+			txMineRes := node.TxMineRes{}
+			err = node.ReadRes(resp, &txMineRes)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			mine.Mine(txMineRes.TX)
+			printResponse(resp)
 			defer resp.Body.Close()
 		},
 	}
