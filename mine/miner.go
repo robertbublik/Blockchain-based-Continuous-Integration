@@ -9,6 +9,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	//"math/rand"
 	"time"
+	"strings"
+	"os"
 )
 
 const rootDir = "/tmp/gitdir"
@@ -84,13 +86,19 @@ func Mine2(ctx context.Context, pb PendingBlock) (database.Block, error) {
 
 
 func Mine(tx database.Tx) {
+	lastIndex := strings.LastIndex(tx.Repository, "/")
+	imageName := tx.Repository[lastIndex + 1:]
+	fmt.Printf(imageName)
+	checkoutDir := filepath.Join(rootDir, imageName)
+
 	// Clone the given repository to the given directory
-	dir := checkoutRepository(tx.Repository, tx.Commit)
+	checkoutRepository(tx, checkoutDir)
 
 	switch tx.Language {
 	case "docker":
 		fmt.Println("Docker build")
-		DockerBuild(tx, dir)
+		dockerfilePath := filepath.Join(checkoutDir, "Dockerfile")
+		DockerBuild(tx, dockerfilePath, imageName)
 	default:
 		fmt.Println("Unknown language.")
 	}
@@ -167,11 +175,15 @@ func (n *Node) removeMinedPendingTXs(block database.Block) {
 	}
 } */
 
-func checkoutRepository(repository string, commit string) string {
-	dir := filepath.Join(rootDir, repository)
-	Info("git clone %s %s", repository, dir)
+func checkoutRepository(tx database.Tx, dir string) {
+	
+	Info("git clone %s\n %s", tx.Repository, dir)
+	if _, err := os.Stat(dir); !os.IsNotExist(err) {
+		fmt.Printf("Repository already cloned")
+		return
+	}
 	r, err := git.PlainClone(dir, false, &git.CloneOptions{
-		URL: repository,
+		URL: tx.Repository,
 	})
 
 	CheckIfError(err)
@@ -184,12 +196,10 @@ func checkoutRepository(repository string, commit string) string {
 
 	w, err := r.Worktree()
 	CheckIfError(err)
-	if commit != "" {
+	if tx.Commit != "" {
 		// ... checking out to commit
-		Info("git checkout %s", commit)
-		err = w.Checkout(&git.CheckoutOptions{
-			Hash: plumbing.NewHash(commit),
-		})
+		Info("git checkout %s", tx.Commit)
+		err = w.Checkout(&git.CheckoutOptions{Hash: plumbing.NewHash(tx.Commit),})
 		CheckIfError(err)
 
 		// ... retrieving the commit being pointed by HEAD, it shows that the
@@ -199,5 +209,4 @@ func checkoutRepository(repository string, commit string) string {
 		CheckIfError(err)
 		fmt.Println(ref.Hash())
 	}
-	return dir
 }

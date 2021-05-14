@@ -26,7 +26,7 @@ func main() {
 		Use:   "bci",
 		Short: "Blockchain-based Continuous Integration CLI",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("test")
+			
 		},
 	}
 
