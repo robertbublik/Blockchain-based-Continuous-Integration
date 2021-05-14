@@ -104,8 +104,8 @@ func (n *Node) Run(ctx context.Context) error {
 		txAddHandler(w, r, n)
 	})
 
-	http.HandleFunc("/tx/mine", func(w http.ResponseWriter, r *http.Request) {
-		txMineHandler(w, r, n)
+	http.HandleFunc("/tx/get", func(w http.ResponseWriter, r *http.Request) {
+		txGetHandler(w, r, n)
 	})
 
 	http.HandleFunc(endpointStatus, func(w http.ResponseWriter, r *http.Request) {

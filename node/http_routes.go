@@ -39,11 +39,11 @@ type CliRes struct {
 	Response string `json:"response"`
 }
 
-type TxMineReq struct {
+type TxGetReq struct {
 	Id	string	`json:"id"`
 }
 
-type TxMineRes struct {
+type TxGetRes struct {
 	TX	database.Tx	`json:"tx"`
 }
 
@@ -105,8 +105,8 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 }
 
 // worker chooses transaction to mine
-func txMineHandler(w http.ResponseWriter, r *http.Request, node *Node) {
-	req := TxMineReq{}
+func txGetHandler(w http.ResponseWriter, r *http.Request, node *Node) {
+	req := TxGetReq{}
 	err := ReadReq(r, &req)
 	if err != nil {
 		WriteErrRes(w, err)
@@ -120,7 +120,7 @@ func txMineHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 
 	tx := node.GetTx(req.Id)
 
-	WriteRes(w, TxMineRes{TX: tx})
+	WriteRes(w, TxGetRes{TX: tx})
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request, node *Node) {

@@ -108,14 +108,14 @@ func txMineCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			id, _ := cmd.Flags().GetString(flagId)
 
-			txIdReq := node.TxMineReq{id}
+			txIdReq := node.TxGetReq{id}
 			payloadBytes, err := json.Marshal(txIdReq)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 			body := bytes.NewReader(payloadBytes)
-			req, err := http.NewRequest("POST", "http://127.0.0.1:8080/tx/mine", body)
+			req, err := http.NewRequest("POST", "http://127.0.0.1:8080/tx/get", body)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
@@ -126,13 +126,13 @@ func txMineCmd() *cobra.Command {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-			txMineRes := node.TxMineRes{}
-			err = node.ReadRes(resp, &txMineRes)
+			TxGetRes := node.TxGetRes{}
+			err = node.ReadRes(resp, &TxGetRes)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-			mine.Mine(txMineRes.TX)
+			mine.Mine(TxGetRes.TX)
 			printResponse(resp)
 			defer resp.Body.Close()
 		},

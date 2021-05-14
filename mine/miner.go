@@ -14,6 +14,7 @@ import (
 )
 
 const rootDir = "/tmp/gitdir"
+var registryUrl = "localhost:8082/"
 
 type PendingBlock struct {
 	index 		uint64
@@ -87,8 +88,8 @@ func Mine2(ctx context.Context, pb PendingBlock) (database.Block, error) {
 
 func Mine(tx database.Tx) {
 	lastIndex := strings.LastIndex(tx.Repository, "/")
-	imageName := tx.Repository[lastIndex + 1:]
-	fmt.Printf(imageName)
+	imageName := strings.ToLower(tx.Repository[lastIndex + 1:])
+	imageTag := registryUrl + imageName
 	checkoutDir := filepath.Join(rootDir, imageName)
 
 	// Clone the given repository to the given directory
@@ -98,47 +99,12 @@ func Mine(tx database.Tx) {
 	case "docker":
 		fmt.Println("Docker build")
 		dockerfilePath := filepath.Join(checkoutDir, "Dockerfile")
-		DockerBuild(tx, dockerfilePath, imageName)
+		DockerBuildAndPush(tx, dockerfilePath, imageTag)
 	default:
 		fmt.Println("Unknown language.")
 	}
 
-	/* var miningCtx context.Context
-	var stopCurrentMining context.CancelFunc
-
-	ticker := time.NewTicker(time.Second * miningIntervalSeconds)
-
-	for {
-		select {
-		case <-ticker.C:
-			go func() {
-				if len(n.pendingTXs) > 0 && !n.isMining {
-					n.isMining = true
-
-					miningCtx, stopCurrentMining = context.WithCancel(ctx)
-					err := n.minePendingTXs(miningCtx)
-					if err != nil {
-						fmt.Printf("ERROR: %s\n", err)
-					}
-
-					n.isMining = false
-				}
-			}()
-
-		case block, _ := <-n.newSyncedBlocks:
-			if n.isMining {
-				blockHash, _ := block.Hash()
-				fmt.Printf("\nPeer mined next Block '%s' faster :(\n", blockHash.Hex())
-
-				n.removeMinedPendingTXs(block)
-				stopCurrentMining()
-			}
-
-		case <-ctx.Done():
-			ticker.Stop()
-			return nil
-		}
-	} */
+	
 }
 /*
 func (n *Node) minePendingTXs(ctx context.Context) error {
@@ -179,7 +145,26 @@ func checkoutRepository(tx database.Tx, dir string) {
 	
 	Info("git clone %s\n %s", tx.Repository, dir)
 	if _, err := os.Stat(dir); !os.IsNotExist(err) {
-		fmt.Printf("Repository already cloned")
+		fmt.Printf("Repository already cloned, pulling\n")
+		r, err := git.PlainOpen(dir)
+		CheckIfError(err)
+
+		// Get the working directory for the repository
+		w, err := r.Worktree()
+		CheckIfError(err)
+
+		// Pull the latest changes from the origin remote and merge into the current branch
+		Info("git pull origin")
+		err = w.Pull(&git.PullOptions{RemoteName: "origin"})
+		CheckIfError(err)
+
+		// Print the latest commit that was just pulled
+		ref, err := r.Head()
+		CheckIfError(err)
+		commit, err := r.CommitObject(ref.Hash())
+		CheckIfError(err)
+
+		fmt.Println(commit)
 		return
 	}
 	r, err := git.PlainClone(dir, false, &git.CloneOptions{
@@ -210,3 +195,40 @@ func checkoutRepository(tx database.Tx, dir string) {
 		fmt.Println(ref.Hash())
 	}
 }
+
+/* var miningCtx context.Context
+	var stopCurrentMining context.CancelFunc
+
+	ticker := time.NewTicker(time.Second * miningIntervalSeconds)
+
+	for {
+		select {
+		case <-ticker.C:
+			go func() {
+				if len(n.pendingTXs) > 0 && !n.isMining {
+					n.isMining = true
+
+					miningCtx, stopCurrentMining = context.WithCancel(ctx)
+					err := n.minePendingTXs(miningCtx)
+					if err != nil {
+						fmt.Printf("ERROR: %s\n", err)
+					}
+
+					n.isMining = false
+				}
+			}()
+
+		case block, _ := <-n.newSyncedBlocks:
+			if n.isMining {
+				blockHash, _ := block.Hash()
+				fmt.Printf("\nPeer mined next Block '%s' faster :(\n", blockHash.Hex())
+
+				n.removeMinedPendingTXs(block)
+				stopCurrentMining()
+			}
+
+		case <-ctx.Done():
+			ticker.Stop()
+			return nil
+		}
+	} */
