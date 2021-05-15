@@ -57,7 +57,7 @@ func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
 			fmt.Println("Docker build")
 			dockerfilePath := filepath.Join(checkoutDir, "Dockerfile")
 			url = registryUrl + repoName
-			DockerBuildAndPush(tx, dockerfilePath, url)
+			DockerBuildAndPush(ctx, tx, dockerfilePath, url)
 		default:
 			fmt.Println("Unknown language.")
 		}
@@ -66,33 +66,6 @@ func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
 	}
 	return block, nil
 }
-
-/* func (n *Node) createBlock(tx database.Tx, url string, toAccount database.Account) error {
-	blockToMine := NewPendingBlock(
-		n.state.NextBlockIndex(),
-		n.state.LatestBlockHash(),
-		tx.Repository,
-		tx.Commit,
-		tx.PrevCommit,
-		toAccount,
-		tx,
-	)
-
-	minedBlock, err := Mine(ctx, blockToMine)
-	if err != nil {
-		return err
-	}
-
-	n.removeMinedPendingTXs(minedBlock)
-
-	_, err = n.state.AddBlock(minedBlock)
-	if err != nil {
-		return err
-	}
-
-	return nil
-} */
-
 
 func (n *Node) removeMinedPendingTXs(block database.Block) {
 	txHash, _ := block.Body.TX.Hash()
@@ -158,40 +131,3 @@ func checkoutRepository(tx database.Tx, dir string) {
 		fmt.Println(ref.Hash())
 	}
 }
-
-/* var miningCtx context.Context
-	var stopCurrentMining context.CancelFunc
-
-	ticker := time.NewTicker(time.Second * miningIntervalSeconds)
-
-	for {
-		select {
-		case <-ticker.C:
-			go func() {
-				if len(n.pendingTXs) > 0 && !n.isMining {
-					n.isMining = true
-
-					miningCtx, stopCurrentMining = context.WithCancel(ctx)
-					err := n.minePendingTXs(miningCtx)
-					if err != nil {
-						fmt.Printf("ERROR: %s\n", err)
-					}
-
-					n.isMining = false
-				}
-			}()
-
-		case block, _ := <-n.newSyncedBlocks:
-			if n.isMining {
-				blockHash, _ := block.Hash()
-				fmt.Printf("\nPeer mined next Block '%s' faster :(\n", blockHash.Hex())
-
-				n.removeMinedPendingTXs(block)
-				stopCurrentMining()
-			}
-
-		case <-ctx.Done():
-			ticker.Stop()
-			return nil
-		}
-	} */

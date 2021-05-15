@@ -89,6 +89,9 @@ func (n *Node) syncBlocks(peer PeerNode, status StatusRes) error {
 	if localBlockIndex == 0 && status.BlockIndex == 0 {
 		newBlocksCount = 1
 	}
+	if newBlocksCount == 0 {
+		return nil
+	}
 	fmt.Printf("Found %d new blocks from Peer %s\n", newBlocksCount, peer.TcpAddress())
 
 	blocks, err := fetchBlocksFromPeer(peer, n.state.LatestBlockHash())
@@ -189,7 +192,7 @@ func queryPeerStatus(peer PeerNode) (StatusRes, error) {
 }
 
 func fetchBlocksFromPeer(peer PeerNode, fromBlock database.Hash) ([]database.Block, error) {
-	fmt.Printf("Importing blocks from Peer %s...\n", peer.TcpAddress())
+	//fmt.Printf("Importing blocks from Peer %s...\n", peer.TcpAddress())
 
 	url := fmt.Sprintf(
 		"http://%s%s?%s=%s",

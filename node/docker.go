@@ -34,26 +34,25 @@ var authConfig = types.AuthConfig{
 	ServerAddress: registryUrl,
 	}
 
-func DockerBuildAndPush(tx database.Tx, dockerfilePath string, imageTag string) {
+func DockerBuildAndPush(ctx context.Context, tx database.Tx, dockerfilePath string, imageTag string) {
 	client, err := client.NewEnvClient()
 	if err != nil {
 		log.Fatalf("Unable to create docker client: %s", err)
 	}
 	
 	tags := []string{imageTag}
-	err = buildImage(client, tags, dockerfilePath)
+	err = buildImage(ctx, client, tags, dockerfilePath)
 	if err != nil {
 		log.Println(err)
 	}
 
-	err = pushImage(client, imageTag)
+	err = pushImage(ctx, client, imageTag)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-func buildImage(client *client.Client, tags []string, dockerfile string)  error {
-	ctx := context.Background()
+func buildImage(ctx context.Context, client *client.Client, tags []string, dockerfile string)  error {
 	// Create a buffer 
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
@@ -112,9 +111,7 @@ func buildImage(client *client.Client, tags []string, dockerfile string)  error 
 }
 
 
-func pushImage(client *client.Client, imageTag string) error {
-	ctx := context.Background()
-
+func pushImage(ctx context.Context, client *client.Client, imageTag string) error {
 	authConfigBytes, _ := json.Marshal(authConfig)
 	authConfigEncoded := base64.URLEncoding.EncodeToString(authConfigBytes)
 

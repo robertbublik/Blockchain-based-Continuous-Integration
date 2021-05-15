@@ -27,7 +27,6 @@ func runCmd() *cobra.Command {
 				database.NewAccount("bootstrap"),
 				false,
 			)
-			fmt.Printf("Starting with account: %s\n", account)
 			n := node.New(getDataDirFromCmd(cmd), ip, port, database.NewAccount(account), bootstrap)
 			err := n.Run(context.Background())
 			if err != nil {

@@ -25,7 +25,7 @@ const endpointAddPeerQueryKeyIP = "ip"
 const endpointAddPeerQueryKeyPort = "port"
 const endpointAddPeerQueryKeyAccount = "account"
 
-const miningIntervalSeconds = 1
+const miningIntervalSeconds = 10
 
 type PeerNode struct {
 	IP          string           `json:"ip"`
@@ -91,7 +91,8 @@ func (n *Node) Run(ctx context.Context) error {
 
 	go n.sync(ctx)
 	go n.mine(ctx)
-
+	
+	
 	http.HandleFunc("/balances/list", func(w http.ResponseWriter, r *http.Request) {
 		listBalancesHandler(w, r, state)
 	})
@@ -148,13 +149,13 @@ func (n *Node) mine(ctx context.Context) error {
 			go func() {
 				if len(n.pendingTXs) > 0 && !n.isMining {
 					n.isMining = true
-
-					miningCtx, stopCurrentMining = context.WithCancel(ctx)
-					err := n.minePendingTXs(miningCtx)
-					if err != nil {
-						fmt.Printf("ERROR: %s\n", err)
+					if n.info.Port != 8080 {
+						miningCtx, stopCurrentMining = context.WithCancel(ctx)
+						err := n.minePendingTXs(miningCtx)
+						if err != nil {
+							fmt.Printf("ERROR: %s\n", err)
+						}
 					}
-
 					n.isMining = false
 				}
 			}()
