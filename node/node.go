@@ -9,7 +9,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"strconv"
-	//"time"
+	"time"
 )
 
 const DefaultAccount = ""
@@ -25,7 +25,7 @@ const endpointAddPeerQueryKeyIP = "ip"
 const endpointAddPeerQueryKeyPort = "port"
 const endpointAddPeerQueryKeyAccount = "account"
 
-const miningIntervalSeconds = 10
+const miningIntervalSeconds = 1
 
 type PeerNode struct {
 	IP          string           `json:"ip"`
@@ -90,7 +90,7 @@ func (n *Node) Run(ctx context.Context) error {
 	fmt.Printf("	- hash: %s\n", n.state.LatestBlockHash().Hex())
 
 	go n.sync(ctx)
-	//go n.mine(ctx)
+	go n.mine(ctx)
 
 	http.HandleFunc("/balances/list", func(w http.ResponseWriter, r *http.Request) {
 		listBalancesHandler(w, r, state)
@@ -136,11 +136,86 @@ func (n *Node) Run(ctx context.Context) error {
 	return nil
 }
 
+func (n *Node) mine(ctx context.Context) error {
+	var miningCtx context.Context
+	var stopCurrentMining context.CancelFunc
+
+	ticker := time.NewTicker(time.Second * miningIntervalSeconds)
+
+	for {
+		select {
+		case <-ticker.C:
+			go func() {
+				if len(n.pendingTXs) > 0 && !n.isMining {
+					n.isMining = true
+
+					miningCtx, stopCurrentMining = context.WithCancel(ctx)
+					err := n.minePendingTXs(miningCtx)
+					if err != nil {
+						fmt.Printf("ERROR: %s\n", err)
+					}
+
+					n.isMining = false
+				}
+			}()
+
+		case block, _ := <-n.newSyncedBlocks:
+			if n.isMining {
+				blockHash, _ := block.Hash()
+				fmt.Printf("\nPeer mined next Block '%s' faster :(\n", blockHash.Hex())
+
+				n.removeMinedPendingTXs(block)
+				stopCurrentMining()
+			}
+
+		case <-ctx.Done():
+			ticker.Stop()
+			return nil
+		}
+	}
+}
+
+func (n *Node) minePendingTXs(ctx context.Context) error {
+	blockToMine := NewPendingBlock(
+		n.state.NextBlockIndex(),
+		n.state.LatestBlockHash(),
+		n.info.Account,
+		n.getPendingTXsAsArray(),
+	)
+
+	minedBlock, err := Mine(ctx, blockToMine)
+	if err != nil {
+		return err
+	}
+
+	n.removeMinedPendingTX(minedBlock)
+
+	_, err = n.state.AddBlock(minedBlock)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (n *Node) removeMinedPendingTX(block database.Block) {
+	if (block.Body.TX != database.Tx{}) && len(n.pendingTXs) > 0 {
+		fmt.Println("Updating in-memory Pending TXs Pool:")
+	}
+
+	txHash, _ := block.Body.TX.Hash()
+	if _, exists := n.pendingTXs[txHash.Hex()]; exists {
+		fmt.Printf("\t-archiving mined TX: %s\n", txHash.Hex())
+
+		n.archivedTXs[txHash.Hex()] = block.Body.TX
+		delete(n.pendingTXs, txHash.Hex())
+	}
+	
+}
+
 func (n *Node) LatestBlockHash() database.Hash {
 	return n.state.LatestBlockHash()
 }
-// TODO: change algorithm to CI
-
 
 func (n *Node) AddPeer(peer PeerNode) {
 	n.knownPeers[peer.TcpAddress()] = peer

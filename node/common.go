@@ -1,4 +1,4 @@
-package mine
+package node
 
 import (
 	"fmt"

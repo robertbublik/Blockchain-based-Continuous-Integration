@@ -44,7 +44,8 @@ type TxGetReq struct {
 }
 
 type TxGetRes struct {
-	TX	database.Tx	`json:"tx"`
+	TX		database.Tx	`json:"tx"`
+	Node 	*Node		`json:"node"`
 }
 
 type StatusRes struct {
@@ -104,7 +105,6 @@ func txAddHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	WriteRes(w, CliRes{Response: "Transaction added succesfully"})
 }
 
-// worker chooses transaction to mine
 func txGetHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	req := TxGetReq{}
 	err := ReadReq(r, &req)
@@ -120,8 +120,26 @@ func txGetHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 
 	tx := node.GetTx(req.Id)
 
-	WriteRes(w, TxGetRes{TX: tx})
+	WriteRes(w, TxGetRes{TX: tx, Node: node})
 }
+
+/* func txMineHandler(w http.ResponseWriter, r *http.Request, node *Node) {
+	req := TxGetReq{}
+	err := ReadReq(r, &req)
+	if err != nil {
+		WriteErrRes(w, err)
+		return
+	}
+	if !node.IsAlreadyPending(req.Id) {
+		err := errors.New("Transaction doesn't exist")
+		WriteErrRes(w, err)
+		return
+	}
+
+	tx := node.GetTx(req.Id)
+
+	WriteRes(w, TxGetRes{TX: tx})
+} */
 
 func statusHandler(w http.ResponseWriter, r *http.Request, node *Node) {
 	res := StatusRes{

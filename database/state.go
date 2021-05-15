@@ -200,6 +200,7 @@ func applyTx(tx Tx, miner Account, s *State) error {
 	if tx.Value > s.Balances[tx.From] {
 		return fmt.Errorf("wrong TX. Sender '%s' balance is %d BCI. Tx cost is %d BCI", tx.From, s.Balances[tx.From], tx.Value)
 	}
+	fmt.Printf("from: %s and to: %s", tx.From, miner)
 
 	s.Balances[tx.From] -= tx.Value
 	s.Balances[miner] += tx.Value

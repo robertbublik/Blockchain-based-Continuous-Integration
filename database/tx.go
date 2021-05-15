@@ -19,7 +19,7 @@ type Tx struct {
 	Repository  string  	`json:"repository"`
 	Language 	string		`json:"language`
 	Commit 		string 		`json:"commit"`
-	prevCommit 	string 		`json:"prevCommit"`
+	PrevCommit 	string 		`json:"prevCommit"`
 	Time  		uint64  	`json:"time"`
 }
 

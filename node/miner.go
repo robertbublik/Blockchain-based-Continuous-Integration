@@ -1,13 +1,13 @@
-package mine
+package node
 
 import (
 	"fmt"
+	"context"
 	"path/filepath"
 	"github.com/robertbublik/bci/database"
-	//"github.com/robertbublik/bci/node"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	//"math/rand"
+	"math/rand"
 	"time"
 	"strings"
 	"os"
@@ -19,100 +19,63 @@ var registryUrl = "localhost:8082/"
 type PendingBlock struct {
 	index 		uint64
 	parent 		database.Hash
-	repository	string
-	commit 		string
-	prevCommit 	string
 	time   		uint64
 	miner  		database.Account
-	tx    		database.Tx
+	txs    		[]database.Tx
 }
 
-func NewPendingBlock(index uint64, parent database.Hash, repository string, commit string, prevCommit string, miner database.Account, tx database.Tx) PendingBlock {
-	return PendingBlock{index, parent, repository, commit, prevCommit, uint64(time.Now().Unix()), miner, tx}
+func NewPendingBlock(index uint64, parent database.Hash, miner database.Account, txs []database.Tx) PendingBlock {
+	return PendingBlock{index, parent, uint64(time.Now().Unix()), miner, txs}
 }
-/*
-func Mine2(ctx context.Context, pb PendingBlock) (database.Block, error) {
-	
-	var block database.Block
-	block = database.NewBlock(pb.index, pb.parent, pb.repository, pb.commit, pb.prevCommit, pb.time, pb.miner, pb.tx, "", "", "")
-	return block, nil
 
-	 if len(pb.txs) == 0 {
+func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
+	if len(pb.txs) == 0 {
 		return database.Block{}, fmt.Errorf("mining empty blocks is not allowed")
 	}
-
-	start := time.Now()
-	attempt := 0
-	var block database.Block
-	var hash database.Hash
-	var nonce uint32
-
-	for !database.IsBlockHashValid(hash) {
-		select {
-		case <-ctx.Done():
-			fmt.Println("Mining cancelled!")
-
-			return database.Block{}, fmt.Errorf("mining cancelled. %s", ctx.Err())
-		default:
-		}
-
-		attempt++
-		nonce = generateNonce()
-
-		if attempt%1000000 == 0 || attempt == 1 {
-			fmt.Printf("Mining %d Pending TXs. Attempt: %d\n", len(pb.txs), attempt)
-		}
-
-		block = database.NewBlock(pb.parent, pb.index, nonce, pb.time, pb.miner, pb.txs)
-		blockHash, err := block.Hash()
-		if err != nil {
-			return database.Block{}, fmt.Errorf("couldn't mine block. %s", err.Error())
-		}
-
-		hash = blockHash
-	}
-
-	fmt.Printf("\nMined new Block '%x' using PoW🎉🎉🎉%s:\n", hash, fs.Unicode("\\U1F389"))
-	fmt.Printf("\tHeight: '%v'\n", block.Header.Index)
-	fmt.Printf("\tNonce: '%v'\n", block.Header.Nonce)
-	fmt.Printf("\tCreated: '%v'\n", block.Header.Time)
-	fmt.Printf("\tMiner: '%v'\n", block.Header.Miner)
-	fmt.Printf("\tParent: '%v'\n\n", block.Header.Parent.Hex())
-
-	fmt.Printf("\tAttempt: '%v'\n", attempt)
-	fmt.Printf("\tTime: %s\n\n", time.Since(start))
-
-	return block, nil 
-}*/
-
-
-func Mine(tx database.Tx) {
-	lastIndex := strings.LastIndex(tx.Repository, "/")
-	imageName := strings.ToLower(tx.Repository[lastIndex + 1:])
-	imageTag := registryUrl + imageName
-	checkoutDir := filepath.Join(rootDir, imageName)
-
-	// Clone the given repository to the given directory
-	checkoutRepository(tx, checkoutDir)
-
-	switch tx.Language {
-	case "docker":
-		fmt.Println("Docker build")
-		dockerfilePath := filepath.Join(checkoutDir, "Dockerfile")
-		DockerBuildAndPush(tx, dockerfilePath, imageTag)
-	default:
-		fmt.Println("Unknown language.")
-	}
-
 	
+	var block 	database.Block
+	//var hash 	database.Hash
+	var tx 		database.Tx
+	var url 	string
+	//var log 	string
+	var done 	bool = false
+
+	randomIndex := rand.Intn(len(pb.txs))
+	tx = pb.txs[randomIndex]
+
+	for !done {
+		lastIndex := strings.LastIndex(tx.Repository, "/")
+		repoName := strings.ToLower(tx.Repository[lastIndex + 1:])
+		
+		checkoutDir := filepath.Join(rootDir, repoName)
+
+		// Clone the given repository to the given directory
+		checkoutRepository(tx, checkoutDir)
+
+		switch tx.Language {
+		case "docker":
+			fmt.Println("Docker build")
+			dockerfilePath := filepath.Join(checkoutDir, "Dockerfile")
+			url = registryUrl + repoName
+			DockerBuildAndPush(tx, dockerfilePath, url)
+		default:
+			fmt.Println("Unknown language.")
+		}
+		block = database.NewBlock(pb.index, pb.parent, tx.Repository, tx.Commit, tx.PrevCommit, pb.time, pb.miner, tx, url, "")
+		done = true
+	}
+	return block, nil
 }
-/*
-func (n *Node) minePendingTXs(ctx context.Context) error {
+
+/* func (n *Node) createBlock(tx database.Tx, url string, toAccount database.Account) error {
 	blockToMine := NewPendingBlock(
+		n.state.NextBlockIndex(),
 		n.state.LatestBlockHash(),
-		n.state.NextBlockNumber(),
-		n.info.Account,
-		n.getPendingTXsAsArray(),
+		tx.Repository,
+		tx.Commit,
+		tx.PrevCommit,
+		toAccount,
+		tx,
 	)
 
 	minedBlock, err := Mine(ctx, blockToMine)
@@ -128,7 +91,7 @@ func (n *Node) minePendingTXs(ctx context.Context) error {
 	}
 
 	return nil
-}
+} */
 
 
 func (n *Node) removeMinedPendingTXs(block database.Block) {
@@ -139,7 +102,7 @@ func (n *Node) removeMinedPendingTXs(block database.Block) {
 		n.archivedTXs[txHash.Hex()] = block.Body.TX
 		delete(n.pendingTXs, txHash.Hex())
 	}
-} */
+}
 
 func checkoutRepository(tx database.Tx, dir string) {
 	

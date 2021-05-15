@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"github.com/spf13/cobra"
 	"github.com/robertbublik/bci/node"
-	"github.com/robertbublik/bci/mine"
 	"os"
 	"encoding/json"
 	"bytes"
@@ -25,7 +24,7 @@ func txCmd() *cobra.Command {
 
 	txCmd.AddCommand(txListCmd())
 	txCmd.AddCommand(txAddCmd())
-	txCmd.AddCommand(txMineCmd())
+	//txCmd.AddCommand(txMineCmd())
 
 	return txCmd
 }
@@ -101,12 +100,13 @@ func txAddCmd() *cobra.Command {
 	return txAddCmd
 }
 
-func txMineCmd() *cobra.Command {
+/* func txMineCmd() *cobra.Command {
 	var txMineCmd = &cobra.Command{
 		Use:   "mine",
 		Short: "Mine a transaction in the BCI.",
 		Run: func(cmd *cobra.Command, args []string) {
 			id, _ := cmd.Flags().GetString(flagId)
+			to, _ := cmd.Flags().GetString(flagTo)
 
 			txIdReq := node.TxGetReq{id}
 			payloadBytes, err := json.Marshal(txIdReq)
@@ -132,11 +132,11 @@ func txMineCmd() *cobra.Command {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-			mine.Mine(TxGetRes.TX)
+			TxGetRes.Node.mine.Mine(TxGetRes.TX, to)
 			printResponse(resp)
 			defer resp.Body.Close()
 		},
 	}
 	addDefaultStringRequiredFlags(txMineCmd, flagId, "", "Id of transaction to be mined")
 	return txMineCmd
-}
+} */
