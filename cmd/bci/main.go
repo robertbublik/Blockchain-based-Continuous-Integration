@@ -31,7 +31,6 @@ func main() {
 		},
 	}
 
-	bciCmd.AddCommand(versionCmd)
 	bciCmd.AddCommand(runCmd())
 	bciCmd.AddCommand(balancesCmd())
 	bciCmd.AddCommand(statusCmd())
