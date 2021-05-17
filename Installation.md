@@ -1,5 +1,8 @@
 ## Installation
 
+### Install packages
+This project requires
+
 ### Install Go 1.13 or higher
 Follow the official docs or use your favorite dependency manager
 to install Go: [https://golang.org/doc/install](https://golang.org/doc/install)
@@ -18,10 +21,10 @@ You can `clone` the repository or use `go get` to install it.
 
 #### Using Git
 ```bash
-mkdir -p $GOPATH/src/github.com/web3coach
-cd $GOPATH/src/github.com/web3coach
+mkdir -p $GOPATH/src/github.com/robertbublik
+cd $GOPATH/src/github.com/robertbublik
 
-git clone git@github.com:robertbublik/bci.git
+git clone git@github.com:robertbublik/Blockchain-based-Continuous-Integration.git
 ```
 
 PS: Make sure you actually clone it inside the `src/github.com/web3coach` directory, not your own, otherwise it won't compile. Go rules.
