@@ -184,7 +184,7 @@ func (n *Node) minePendingTXs(ctx context.Context) error {
 		n.getPendingTXsAsArray(),
 	)
 
-	minedBlock, err := Mine(ctx, blockToMine)
+	minedBlock, err := Mine(ctx, blockToMine, n.dataDir)
 	if err != nil {
 		return err
 	}

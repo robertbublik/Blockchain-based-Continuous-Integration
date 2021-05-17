@@ -13,8 +13,7 @@ import (
 	"os"
 )
 
-const rootDir = "/tmp/gitdir"
-var registryUrl = "localhost:8082/"
+var registryUrl = "localhost:5000/"
 
 type PendingBlock struct {
 	index 		uint64
@@ -28,7 +27,7 @@ func NewPendingBlock(index uint64, parent database.Hash, miner database.Account,
 	return PendingBlock{index, parent, uint64(time.Now().Unix()), miner, txs}
 }
 
-func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
+func Mine(ctx context.Context, pb PendingBlock, dataDir string) (database.Block, error) {
 	if len(pb.txs) == 0 {
 		return database.Block{}, fmt.Errorf("mining empty blocks is not allowed")
 	}
@@ -37,7 +36,6 @@ func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
 	//var hash 	database.Hash
 	var tx 		database.Tx
 	var url 	string
-	//var log 	string
 	var done 	bool = false
 
 	randomIndex := rand.Intn(len(pb.txs))
@@ -47,7 +45,7 @@ func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
 		lastIndex := strings.LastIndex(tx.Repository, "/")
 		repoName := strings.ToLower(tx.Repository[lastIndex + 1:])
 		
-		checkoutDir := filepath.Join(rootDir, repoName)
+		checkoutDir := filepath.Join(dataDir, repoName)
 
 		// Clone the given repository to the given directory
 		checkoutRepository(tx, checkoutDir)
@@ -61,7 +59,7 @@ func Mine(ctx context.Context, pb PendingBlock) (database.Block, error) {
 		default:
 			fmt.Println("Unknown language.")
 		}
-		block = database.NewBlock(pb.index, pb.parent, tx.Repository, tx.Commit, tx.PrevCommit, pb.time, pb.miner, tx, url, "")
+		block = database.NewBlock(pb.index, pb.parent, tx.Repository, tx.Commit, tx.PrevCommit, pb.time, pb.miner, tx, url)
 		done = true
 	}
 	return block, nil
