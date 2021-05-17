@@ -83,16 +83,13 @@ func checkoutRepository(tx database.Tx, dir string) {
 		r, err := git.PlainOpen(dir)
 		CheckIfError(err)
 
-		// Get the working directory for the repository
 		w, err := r.Worktree()
 		CheckIfError(err)
 
-		// Pull the latest changes from the origin remote and merge into the current branch
 		Info("git pull origin")
 		err = w.Pull(&git.PullOptions{RemoteName: "origin"})
 		CheckIfError(err)
 
-		// Print the latest commit that was just pulled
 		ref, err := r.Head()
 		CheckIfError(err)
 		commit, err := r.CommitObject(ref.Hash())
@@ -107,7 +104,6 @@ func checkoutRepository(tx database.Tx, dir string) {
 
 	CheckIfError(err)
 	
-	// ... retrieving the commit being pointed by HEAD
 	Info("git show-ref --head HEAD")
 	ref, err := r.Head()
 	CheckIfError(err)
@@ -116,13 +112,10 @@ func checkoutRepository(tx database.Tx, dir string) {
 	w, err := r.Worktree()
 	CheckIfError(err)
 	if tx.Commit != "" {
-		// ... checking out to commit
 		Info("git checkout %s", tx.Commit)
 		err = w.Checkout(&git.CheckoutOptions{Hash: plumbing.NewHash(tx.Commit),})
 		CheckIfError(err)
 
-		// ... retrieving the commit being pointed by HEAD, it shows that the
-		// repository is pointing to the giving commit in detached mode
 		Info("git show-ref --head HEAD")
 		ref, err = r.Head()
 		CheckIfError(err)

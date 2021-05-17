@@ -115,7 +115,6 @@ func pushImage(ctx context.Context, client *client.Client, imageTag string) erro
 	authConfigBytes, _ := json.Marshal(authConfig)
 	authConfigEncoded := base64.URLEncoding.EncodeToString(authConfigBytes)
 
-	//tag := dockerRegistryUserID + "/node-hello"
 	opts := types.ImagePushOptions{RegistryAuth: authConfigEncoded}
 	fmt.Printf("Pushing image %s", imageTag)
 	imagePushResponse, err := client.ImagePush(ctx, imageTag, opts)
