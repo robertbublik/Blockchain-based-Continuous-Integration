@@ -3,27 +3,7 @@
 Table of Contents
 =================
 
-   * [TBB Training Ledger](#tbb-training-ledger)
-      * [Sneak peek to Chapter 13](#sneak-peek-to-chapter-13)
-         * [1/4 Check the current blockchain network status](#14-check-the-current-blockchain-network-status)
-         * [2/4 Download the pre-compiled blockchain program](#24-download-the-pre-compiled-blockchain-program)
-            * [Install](#install)
-               * [Download](#download)
-                  * [Linux](#linux)
-                  * [MacOS](#macos)
-               * [Verify the version](#verify-the-version)
-         * [3/4 Connect to the training network](#34-connect-to-the-training-network)
-         * [4/4 Check the current blockchain network status](#44-check-the-current-blockchain-network-status)
-   * [Introduction](#introduction)
-      * [How?](#how)
-      * [What will you build?](#what-will-you-build)
-         * [1) You will build a peer-to-peer system from scratch](#1-you-will-build-a-peer-to-peer-system-from-scratch)
-         * [2) You will secure the system with a day-to-day practical cryptography](#2-you-will-secure-the-system-with-a-day-to-day-practical-cryptography)
-         * [3) You will implement Bitcoin, Ethereum and XRP backend components](#3-you-will-implement-bitcoin-ethereum-and-xrp-backend-components)
-         * [4) You will write unit tests and integration tests for all core components](#4-you-will-write-unit-tests-and-integration-tests-for-all-core-components)
-      * [How to use this repository](#how-to-use-this-repository)
-      * [Installation](#installation)
-      * [Getting started](#getting-started)
+   
    * [Usage](#usage)
       * [Install](#install-1)
       * [CLI](#cli)
@@ -38,11 +18,6 @@ Table of Contents
          * [Send a signed TX](#send-a-signed-tx)
          * [Check node's status (latest block, known peers, pending TXs)](#check-nodes-status-latest-block-known-peers-pending-txs)
       * [Tests](#tests)
-   * [Start](#start)
-      * [Get the first 7 chapters for FREE](#get-the-first-7-chapters-for-free)
-      * [Buy complete eBook](#buy-complete-ebook)
-   * [Finish](#finish)
-      * [Request 1000 TBB testing tokens](#request-1000-tbb-testing-tokens)
 
 ## Warning
 This implementation currently only works on Linux.
@@ -96,8 +71,4 @@ bci tx add --from=developer-2 --value=200 --language=docker --repository=https:/
 bci tx add --from=developer-3 --value=300 --language=docker --repository=https://github.com/robertbublik/BCI_docker
 ```
 
-#### Run a second TBB node connecting to your first one
-```
-tbb run --datadir=$HOME/.tbb --ip=127.0.0.1 --port=8081 --bootstrap-ip=127.0.0.1 --bootstrap-port=8080
-```
 
